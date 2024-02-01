@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WerfLogApp.MainPage">
+
+    <!-- Hoofd Grid voor de hele pagina -->
+    <Grid RowSpacing="0" BackgroundColor="FloralWhite">
+
+        <!-- Definieer de rijen -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Voor de logo's en de hoofdafbeelding -->
+            <RowDefinition Height="Auto"/>
+            <!-- Voor de invoerbalk met bevestigingsknop -->
+            <RowDefinition Height="*"/>
+            <!-- Voor de lijst -->
+            <RowDefinition Height="Auto"/>
+            <!-- Voor de footer met logo's en timer -->
+        </Grid.RowDefinitions>
+
+        <!-- Grid voor de bovenste rij (logo's en hoofdafbeelding) -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Voor het linker logo -->
+                <ColumnDefinition Width="*"/>
+                <!-- Voor de hoofdafbeelding en ruimte -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Voor het rechter logo -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Linker Logo met TapGestureRecognizer -->
+            <Image Source="meeting2_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="55" VerticalOptions="Start" Margin="4,10,0,0">
+                <Image.GestureRecognizers>
+                    <!--<TapGestureRecognizer Tapped="LinkerLogo_Tapped"/>-->
+                </Image.GestureRecognizers>
+            </Image>
+
+            <!-- Hoofdafbeelding in het midden -->
+            <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center"/>
+
+            <!-- Rechter Logo met TapGestureRecognizer -->
+            <Image Source="zandloper_logo.png" Grid.Column="2" Aspect="AspectFit" HeightRequest="45"  VerticalOptions="Start" Margin="0,13,10,0">
+                <Image.GestureRecognizers>
+                    <!--<TapGestureRecognizer Tapped="RechterLogo_Tapped"/>-->
+                </Image.GestureRecognizers>
+            </Image>
+        </Grid>
+
+        <!-- Invoerbalk met bevestigingsknop -->
+        <Grid Grid.Row="1" Padding="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Entry x:Name="NieuweWerfEntry" Grid.Column="0" Placeholder="Nieuwe werf" Text="{Binding NieuweWerfText, Mode=TwoWay}"/>
+            <Button x:Name="ToevoegenButton" Text="Toevoegen" Grid.Column="1"  
+                    WidthRequest="100" BackgroundColor="DarkSlateGrey" Margin="10,0,0,0" HeightRequest="38"  Command="{Binding VoegWerfToeCommand}" />
+        </Grid>
+
+        <!-- ScrollView voor de lijst, maakt alleen dit gedeelte scrollbaar -->
+        <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" >
+            <StackLayout Padding="10">
+                <!-- Een lijst van werven -->
+                <ListView x:Name="WervenListView"  ItemsSource="{Binding Werven}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <SwipeView>
+                                    <SwipeView.RightItems>
+                                        <SwipeItems>
+                                            <!-- Knop voor verwijderen -->
+                                            <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
+                                                       Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.VerwijderCommand}" 
+                                                       CommandParameter="{Binding .}"/> 
+                                        </SwipeItems>
+                                    </SwipeView.RightItems>
+
+                                    <Grid Padding="5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Naam van de werf -->
+                                        <Label Text="{Binding Naam}" Grid.Column="0" />
+
+                                        <!-- Gesture met logo -->
+                                        <Grid Grid.Column="1" 
+                                              WidthRequest="50" 
+                                              HeightRequest="50" 
+                                              HorizontalOptions="End" 
+                                              VerticalOptions="Center" 
+                                              BackgroundColor="Transparent">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding id}">
+                                 
+                                                </TapGestureRecognizer>
+
+                                            </Grid.GestureRecognizers>
+                                            <Image Source="boek_penseel_logo.png" Aspect="AspectFit"/>
+                                        </Grid>
+
+                                    </Grid>
+                                </SwipeView>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+        </ScrollView>
+
+        <!-- Footer met logo's en timer -->
+        <Grid Grid.Row="3" Padding="30,20,30,25" VerticalOptions="End">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Voor het linker logo -->
+                <ColumnDefinition Width="*"/>
+                <!-- Voor de timer -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Voor het rechter logo -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Linker Logo -->
+            <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="60" WidthRequest="60" HorizontalOptions="Start"/>
+
+            <!-- Timer Label -->
+            <Label x:Name="TimerLabel" Text="00:00:00" Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" />
+
+            <!-- Rechter Logo -->
+            <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="60" WidthRequest="60" HorizontalOptions="End"/>
+
+      
+        </Grid>
+      
+    </Grid>
+</ContentPage>
