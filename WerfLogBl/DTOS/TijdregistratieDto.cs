@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WerfLogApp.Models
+namespace WerfLogBl.DTOS
 {
-    public class Tijdregistratie
+    public class TijdregistratieDto
     {
-        public string Id { get; set; }
-        public string WerfId { get; set; } 
+        public int? Id { get; set; }
+        public int WerfId { get; set; }
         public DateTime StartTijd { get; set; }
         public DateTime EindTijd { get; set; }
     }

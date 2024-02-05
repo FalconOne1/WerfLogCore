@@ -94,7 +94,7 @@
                                               VerticalOptions="Center" 
                                               BackgroundColor="Transparent">
                                             <Grid.GestureRecognizers>
-                                                <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding id}">
+                                                <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding .}"> <!--was binding id-->
                                  
                                                 </TapGestureRecognizer>
 

@@ -4,7 +4,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WerfLogApp.NotitiePage"
              Shell.NavBarIsVisible="False"
-             xmlns:local="clr-namespace:WerfLogApp.ViewModels">
+             xmlns:local="clr-namespace:WerfLogApp.ViewModels"
+             BackgroundColor="FloralWhite">
 
      <!--Stel de BindingContext in op NotitieViewModel--> 
     <ContentPage.BindingContext>
@@ -32,7 +33,7 @@
         </StackLayout>
 
          <!--Werfnaam--> 
-        <Label Grid.Row="1" Text="{Binding Text}" FontSize="Large" HorizontalOptions="Start" Margin="10,0,0,0"/>
+        <Label Grid.Row="1" Text="{Binding WerfNaam}" FontSize="Large" HorizontalOptions="Start" Margin="10,0,0,0"/>
 
          <!--Invoerbalk met Toevoegknop--> 
         <Grid Grid.Row="2" Padding="10">
