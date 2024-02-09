@@ -6,6 +6,9 @@
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(NotitiePage), typeof(NotitiePage));
+            Routing.RegisterRoute(nameof(TijdregistratiePage), typeof(TijdregistratiePage));
+           
+
         }
     }
 }

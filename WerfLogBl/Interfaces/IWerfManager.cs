@@ -10,6 +10,8 @@ namespace WerfLogBl.Interfaces
 {
    public interface IWerfManager
     {
-        WerfDto AddWerf(WerfDto werfDto);
+        //WerfDto AddWerf(WerfDto werfDto);
+        Task<List<WerfDto>> HaalAlleWervenOp();
+        Task<WerfDto> AddWerfAsync(WerfDto werfDto);
     }
 }

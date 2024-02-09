@@ -1,9 +1,13 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
 using WerfLogBl.Managers;
+using WerfLogDal.Exceptions;
+using WerfLogDal.Interfaces;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace WerfLogApp.ViewModels
@@ -12,9 +16,23 @@ namespace WerfLogApp.ViewModels
     {
 
         private IWerfManager _werfManager;
+        private ITijdregistratieManager _tijdregistratieManager;
+
+        private bool _isDataGeladen = false;
+        private int _actieveTijdRegistratieId;
+        private bool _actieveWerf = false;
+
+
+        private string _actieveWerfNaam;
+
+        [ObservableProperty]
+        private string _timerLabelText = "Afwezig";
 
         [ObservableProperty]
         private string _nieuweWerfText; //achterliggend wordt een public NieuweWerfText aangemaakt. 
+
+        [ObservableProperty]
+        private WerfDto _geselecteerdeWerf;
 
         //private field
         private ObservableCollection<WerfDto> _werven;
@@ -30,60 +48,63 @@ namespace WerfLogApp.ViewModels
             }
         }
 
-        //constructor met dummy gegevens (tijdelijk)
-
-        public WerfViewModel(IWerfManager werfManager)
+        public WerfViewModel(IWerfManager werfManager, ITijdregistratieManager tijdregistratieManager)
         {
             _werfManager = werfManager;
-
-            Werven = new ObservableCollection<WerfDto>()
-            {
-                new WerfDto {Id= 1, Naam = "test1"},
-                new WerfDto {Id= 2, Naam = "test2"},
-                new WerfDto {Id= 3, Naam = "test3"}
-            };
-         
+            _tijdregistratieManager = tijdregistratieManager;
+            Werven = new ObservableCollection<WerfDto>();
+            
         }
 
 
-        //aanmaken 
-        public Command VoegWerfToeCommand => new Command(WerfAanmaken);
+        //COMMAND AANMAKEN WERF
+        public Command VoegWerfToeCommand => new Command(async () => await WerfAanmakenAsync());
 
-        //public void WerfAanmaken()
-        //{
-        //    if (!string.IsNullOrEmpty(NieuweWerfText))
-        //    {
-        //        Werven.Insert(0, new WerfDto { Id = Guid.NewGuid().ToString(), Naam = NieuweWerfText });   //insert om nieuwe entry vanboven in de lijst te krijgen ipv onder 
-        //        NieuweWerfText = string.Empty;
-        //    }
-        //}
-
-        public void WerfAanmaken()
+        //METHODE AANMAKEN WERF
+        public async Task WerfAanmakenAsync()
         {
             if (!string.IsNullOrEmpty(NieuweWerfText))
             {
-                var werfDto = new WerfDto { Naam = NieuweWerfText, Id = null};
+                var werfDto = new WerfDto { Naam = NieuweWerfText, Id = null, IsActief = 1};
 
-                // Voeg de Werf toe en krijg de bijgewerkte WerfDto terug (met de nieuwe ID)
-                var toegevoegdeWerfDto = _werfManager.AddWerf(werfDto);
-
-                if (toegevoegdeWerfDto != null)
+                try
                 {
-                    // De werf is succesvol toegevoegd aan de database
-                    Werven.Insert(0, toegevoegdeWerfDto); // Voeg de bijgewerkte DTO toe aan de ObservableCollection
+                    // Voeg de Werf toe en krijg de bijgewerkte WerfDto terug (met de nieuwe ID)
+                    var toegevoegdeWerfDto = await _werfManager.AddWerfAsync(werfDto);
 
-                    // Maak het invoerveld leeg
-                    NieuweWerfText = string.Empty;
+                    if (toegevoegdeWerfDto != null)
+                    {
+                        // De werf is succesvol toegevoegd aan de database.
+                        Werven.Insert(0, toegevoegdeWerfDto); 
+
+                        // Maak het invoerveld leeg
+                        NieuweWerfText = string.Empty;
+                    }
+                    else
+                    {
+                        //Handel de situatie af als het toevoegen mislukt.
+                       await ShowErrorMessage("Het toevoegen van de werf is mislukt.");
+                    }
                 }
-                else
+                catch (DatabaseException ex)
                 {
-                    // Handel de situatie af als het toevoegen mislukt (toon een foutmelding, etc.)
+                    // Specifieke afhandeling voor databasegerelateerde fouten.
+                    await ShowErrorMessage($"Databasefout: {ex.Message}");
                 }
+                catch (Exception ex)
+                {
+                    // Algemene foutafhandeling.
+                   await  ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                }
+            }
+            else
+            {
+               await ShowErrorMessage("Werfnaam mag niet leeg zijn.");
             }
         }
 
 
-        //command voor verwijderen van een werf, dus geen EventHandler.
+        //COMMAND VERWIJDEREN WERF (command vervangt eventhandler)
         //Linkt met databinding in xaml mainpage.
         public Command<WerfDto> VerwijderCommand => new Command<WerfDto>(async (werf) =>
         {
@@ -96,34 +117,185 @@ namespace WerfLogApp.ViewModels
             }
         });
 
+        //METHODE VERWIJDEREN WERF
         public void WerfVerwijderen(WerfDto werf)
         {
             Werven.Remove(werf);
         }
 
-        //navigatie notitie 
+        //COMMAND NAVIGATIE NAAR NOTITIES VAN WERF
+        public Command<WerfDto> NotitieCommand => new Command<WerfDto>(async (werfDto) => await TapWerf(werfDto));
 
-        //public Command<int> NotitieCommand => new Command<int>(TapWerf); // was string, tijdelijk naar int 
-        //public async void TapWerf(int werfId)
-        //{
-        //    await Shell.Current.GoToAsync($"{nameof(NotitiePage)}?text={werfId}"); //vermoedelijk is werfnaam ID geworden !!!
-        //    Console.WriteLine();
-        //}
-
-
-        public Command<WerfDto> NotitieCommand => new Command<WerfDto>(TapWerf);
-
-        public async void TapWerf(WerfDto werf)
+        //METHODE NAVIGATIE
+        public async Task TapWerf(WerfDto werf)
         {
             if (werf != null)
             {
-                await Shell.Current.GoToAsync($"{nameof(NotitiePage)}?werfNavigatieId={werf.Id}&werfNaam={werf.Naam}");
+                try
+                {
+                    await Shell.Current.GoToAsync($"{nameof(NotitiePage)}?werfNavigatieId={werf.Id}&werfNaam={werf.Naam}");
+                }
+                catch (Exception ex)
+                {
+                    await ShowErrorMessage("Fout bij navigeren naar notities");
+                }
             }
         }
 
 
+        //ERROR POPUP IN VIEW
+        private async Task ShowErrorMessage(string message)
+        { 
+         await App.Current.MainPage.DisplayAlert("Fout", message, "OK");
+        }
 
+
+        //COMMAND TIJDSREGISTRATIE START
+        public Command GroeneKnopCommand => new Command(async () =>
+        {
+           
+            if (GeselecteerdeWerf != null )
+            {
+                // Voer de logica uit voor het opslaan van de datum en tijd
+                await SlaDateTimeOp(GeselecteerdeWerf);
+                
+            }
+            else
+            {
+                await ShowErrorMessage($"Selecteer een werf.");
+            }
+        });
+
+
+        // Methode om de datum en tijd op te slaan
+        private async Task SlaDateTimeOp(WerfDto werf)
+        {
+            try
+            {
+               if (!_actieveWerf)
+                {
+                    _actieveTijdRegistratieId = await _tijdregistratieManager.VoegStarttijdWerfToe(werf);
+                    _actieveWerf = true;
+                    TimerLabelText = "Aanwezig";
+
+
+                }
+                else
+                {
+                    await ShowErrorMessage($"Laatste werf is nog actief, gelieve deze eerst af te sluiten.\n(Controleer uw tijdregistraties en pas zo nodig aan.)"); 
+
+                    //wel opletten dat de naam ook beschikbaar is bij het opnieuw opstarten ! te checken
+                }
+             
+            }
+            catch (Exception ex)
+            {
+                // Toon foutmelding
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+        }
+
+        //COMMAND TIJDSREGISTRATIE STOP
+        public Command RodeKnopCommand => new Command(async () =>
+        {
+
+            if (_actieveWerf)
+            {
+                // Voer de logica uit voor het opslaan van de datum en tijd
+                await SlaStopDateTimeOp(_actieveTijdRegistratieId);
+               
+            }
+            else
+            {
+                // Toon een foutmelding of maak de knop inactief als er geen werf geselecteerd is
+            }
+        });
+
+
+        // Methode om de datum en tijd op te slaan
+        private async Task SlaStopDateTimeOp(int actieveTijdId)
+        {
+            try
+            {
+                if (actieveTijdId != 0 )
+                {
+                 await _tijdregistratieManager.VoegStoptijdWerfToe(actieveTijdId);
+                    _actieveWerf = false;
+                    TimerLabelText = "Afwezig";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Toon foutmelding
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+        }
+
+        private async Task IsErNogEenLopendeTijdRegistratieVanWerf()
+        {
+            try
+            {
+
+               
+                // Haal de actieve tijdregistratie op (waar StopTijd nog NULL is)
+                var actieveTijdregistratie = await _tijdregistratieManager.GetActieveTijdregistratieId();
+
+                if(actieveTijdregistratie == null)
+                {
+                    return;
+                }
+
+                _actieveTijdRegistratieId = (int)actieveTijdregistratie.Id;
+                _actieveWerf = true;
+                TimerLabelText = "Aanwezig";
+
+
+            }
+            catch (Exception ex)
+            {
+                // Foutafhandeling
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                
+            }
+        }
+
+        public async Task HaalAlleWervenOpAsync()
+        {
+            if (!_isDataGeladen)
+            {
+                var wervenDto = await _werfManager.HaalAlleWervenOp();
+                foreach (var werfDto in wervenDto)
+                {
+                    Werven.Add(werfDto);
+                }
+                _isDataGeladen = true;
+
+                if (Werven.Count > 0)
+                {
+                    await IsErNogEenLopendeTijdRegistratieVanWerf();
+                  
+                }
+            }
+        }
+        public Command TijdRegistratieCommand => new Command(async () => await TapTijdRegistratie());
+
+
+        // Aangepaste methode zonder parameter
+        public async Task TapTijdRegistratie()
+        {
+            try
+            {
+                await Shell.Current.GoToAsync($"{nameof(TijdregistratiePage)}");
+            }
+            catch (Exception ex)
+            {
+                // Log of toon fout
+            }
+        }
 
     }
+
 }
+
  

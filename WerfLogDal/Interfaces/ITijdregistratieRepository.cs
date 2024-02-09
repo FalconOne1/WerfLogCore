@@ -9,5 +9,9 @@ namespace WerfLogDal.Interfaces
 {
     public interface ITijdregistratieRepository : IGenericRepository<Tijdregistratie>
     {
+        Task<Tijdregistratie> GetEmptyStopDateTimeAsync();
+        Task UpdateStopTijdById(int id, DateTime stopTijd);
+
+        Task<Tijdregistratie> GetTijdregistratieById(int id);
     }
 }

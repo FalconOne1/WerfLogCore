@@ -6,6 +6,7 @@ namespace WerfLogDal.Models
     //[Table("Notities")]
     public  class Notitie : BaseModel
     {
+        
 
         //[PrimaryKey, AutoIncrement]
         //public int Id { get; set; }

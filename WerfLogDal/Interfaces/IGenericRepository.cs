@@ -10,13 +10,13 @@ namespace WerfLogDal.Interfaces
 {
     public interface IGenericRepository<T> 
     {
-        List<T> GetAll();
-        T GetById(int id);
-        T InsertWithReturn(T entity);
-        int Update(T entity);
+        Task<List<T>> GetAllAsync();
+        Task<T> GetById(int id);
+        Task<T> InsertWithReturnAsync(T entity);
+      
         int Delete(T entity);
 
-        void InsertWithNoReturn(T entity);
+        Task InsertWithNoReturnAsync(T entity);
 
     }
 

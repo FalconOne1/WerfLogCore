@@ -35,9 +35,10 @@ namespace WerfLogApp
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddSingleton<WerfViewModel>();
 
-            builder.Services.AddSingleton<NotitiePage>();
-            builder.Services.AddSingleton<NotitieViewModel>();
-
+            builder.Services.AddTransient<NotitiePage>();
+            builder.Services.AddTransient<NotitieViewModel>(); //gegevens uit db eerst opvragen per notitie
+            builder.Services.AddTransient<TijdregistratiePage>();
+            builder.Services.AddTransient<TijdregistratieViewModel>();
 
             // Configureer je repositories
             builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -48,6 +49,9 @@ namespace WerfLogApp
 
             builder.Services.AddTransient<IWerfManager, WerfManager>();
             builder.Services.AddTransient<INotitieManager, NotitieManager>();
+
+            builder.Services.AddTransient<ITijdregistratieManager, TijdregistratieManager>();
+            
 
             return builder.Build();
         }

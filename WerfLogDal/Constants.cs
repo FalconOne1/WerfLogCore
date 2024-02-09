@@ -12,7 +12,6 @@
             SQLite.SQLiteOpenFlags.Create |
             SQLite.SQLiteOpenFlags.SharedCache;
 
-
         public static string DatabasePath =>
             Path.Combine(FileSystem.AppDataDirectory, DatabaseFileName);
     }

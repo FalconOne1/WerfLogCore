@@ -30,11 +30,20 @@
             </Grid.ColumnDefinitions>
 
             <!-- Linker Logo met TapGestureRecognizer -->
+            <!--<Image Source="meeting2_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="55" VerticalOptions="Start" Margin="4,10,0,0" >
+                <Image.GestureRecognizers
+                    Command="{Binding TijdRegistratieCommand}">
+                    --><!--<TapGestureRecognizer Tapped="LinkerLogo_Tapped"/>--><!--
+                </Image.GestureRecognizers>
+            </Image>-->
+
             <Image Source="meeting2_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="55" VerticalOptions="Start" Margin="4,10,0,0">
                 <Image.GestureRecognizers>
-                    <!--<TapGestureRecognizer Tapped="LinkerLogo_Tapped"/>-->
+                    <TapGestureRecognizer Command="{Binding TijdRegistratieCommand}" NumberOfTapsRequired="1"/>
                 </Image.GestureRecognizers>
             </Image>
+
+
 
             <!-- Hoofdafbeelding in het midden -->
             <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center"/>
@@ -63,7 +72,7 @@
         <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" >
             <StackLayout Padding="10">
                 <!-- Een lijst van werven -->
-                <ListView x:Name="WervenListView"  ItemsSource="{Binding Werven}">
+                <ListView x:Name="WervenListView"  ItemsSource="{Binding Werven}" SelectedItem="{Binding GeselecteerdeWerf, Mode=TwoWay}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
@@ -122,16 +131,24 @@
                 <!-- Voor het rechter logo -->
             </Grid.ColumnDefinitions>
 
-            <!-- Linker Logo -->
-            <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="60" WidthRequest="60" HorizontalOptions="Start"/>
+            <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="50" WidthRequest="50" HorizontalOptions="Start">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GroeneKnopCommand}" NumberOfTapsRequired="2"/>
+                </Image.GestureRecognizers>
+            </Image>
 
             <!-- Timer Label -->
-            <Label x:Name="TimerLabel" Text="00:00:00" Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Label x:Name="TimerLabel" Text="{Binding TimerLabelText}" Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" />
 
-            <!-- Rechter Logo -->
-            <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="60" WidthRequest="60" HorizontalOptions="End"/>
 
-      
+            <!-- Rechter Chrono Image met TapGestureRecognizer -->
+            <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="50" WidthRequest="50" HorizontalOptions="End">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding RodeKnopCommand}" NumberOfTapsRequired="2"/>
+                </Image.GestureRecognizers>
+            </Image>
+
+
         </Grid>
       
     </Grid>

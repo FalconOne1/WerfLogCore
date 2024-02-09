@@ -7,10 +7,6 @@
              xmlns:local="clr-namespace:WerfLogApp.ViewModels"
              BackgroundColor="FloralWhite">
 
-     <!--Stel de BindingContext in op NotitieViewModel--> 
-    <ContentPage.BindingContext>
-        <local:NotitieViewModel />
-    </ContentPage.BindingContext>
 
     <Grid RowSpacing="0" BackgroundColor="FloralWhite" VerticalOptions="Start">
          <!--Rij definities--> 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
+using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
 using WerfLogDal.Repositories;
@@ -23,37 +24,53 @@ namespace WerfLogBl.Managers
             _notitieRepository = notitieRepository;
         }
 
-
-
-        //public void AddNotitie(NotitieDto notitieDto)
-        //{
-        //    // Converteer de DTO naar het DAL-model Notitie
-        //    var notitie = new Notitie
-        //    {
-        //        Datum = notitieDto.Datum,
-        //        Tekst = notitieDto.Tekst,
-        //        WerfId = notitieDto.WerfId
-                
-        //        // Vul andere eigenschappen in als dat nodig is
-        //    };
-
-        //    // Voeg de Notitie toe aan de database
-        //     _notitieRepository.InsertWithNoReturn(notitie);
-        //}
-
-        public NotitieDto AddNotitie(NotitieDto notitieDto)
+        public async Task<List<NotitieDto>> GetAllNotities(int werfId)
         {
-            // Map NotitieDto naar Notitie
-            Notitie notitie = _mapper.Map<Notitie>(notitieDto);
+            try
+            {
+                List<Notitie> notities = await _notitieRepository.GetAllNotitiesByWerfIdAsync(werfId);
 
-            // Voeg de Notitie toe aan de database
-           Notitie nieuweNotitie =  _notitieRepository.InsertWithReturn(notitie);
+                List<NotitieDto> notitieDtos = _mapper.Map<List<NotitieDto>>(notities);
 
-            NotitieDto nieuweNotitieDto = _mapper.Map<NotitieDto>(nieuweNotitie);
+                return notitieDtos;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+           
+        }
 
-            return nieuweNotitieDto;
+        public async Task<NotitieDto> AddNotitieAsync(NotitieDto notitieDto)
+        {
+            try
+            {
+                // Map NotitieDto naar Notitie met behulp van AutoMapper
+                Notitie notitie = _mapper.Map<Notitie>(notitieDto);
 
+                // Voeg de Notitie toe aan de database en wacht op het resultaat
+                // Dit veronderstelt dat InsertWithReturnAsync een asynchrone methode is die een Notitie object teruggeeft
+                Notitie nieuweNotitie = await _notitieRepository.InsertWithReturnAsync(notitie);
 
+                // Map het resultaat (Notitie) terug naar NotitieDto met behulp van AutoMapper
+                NotitieDto nieuweNotitieDto = _mapper.Map<NotitieDto>(nieuweNotitie);
+
+                // Retourneer het NotitieDto object
+                return nieuweNotitieDto;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+           
         }
 
     }

@@ -1,47 +1,40 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using WerfLogDal.Interfaces;
-using WerfLogDal.Models;
-using WerfLogDal.Repositories;
-
+using WerfLogDal.Exceptions;
 
 namespace WerfLogDal
 {
-    public class DbContext :IDisposable
+    public class DbContext /*:IDisposable*/
     {
 
-        private SQLiteConnection _connection;
+        private SQLiteAsyncConnection _connection;
         private bool _initialized = false;
-
-
-        // Methode om de SQLiteAsyncConnection te verkrijgen
-        //public SQLiteConnection GetConnection() => _connection;
 
         public DbContext()
         {
-            
-            _connection = new SQLiteConnection(Constants.DatabasePath, Constants.Flags);
-         
+            //_/*connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);*/
+              //GetConnectionAsync();
         }
 
-        private void Init()
+        private async Task Init()
         {
-            if (!_initialized)
+            try
             {
 
-                // Activeer foreign key support
-                _connection.Execute("PRAGMA foreign_keys = ON");
+                if (!_initialized)
+                {
+                    // Activeer foreign key support
+                    await _connection.ExecuteAsync("PRAGMA foreign_keys = ON");
 
-                // Creëer de tabel 'Werven'
-                _connection.Execute(@"
+                    // Creëer de tabel 'Werven'
+                    await _connection.ExecuteAsync(@"
                                 CREATE TABLE IF NOT EXISTS Werf (
                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                Naam TEXT CHECK(length(Naam) <= 150));
+                                Naam TEXT CHECK(length(Naam) <= 150),
+                                IsActief INTEGER DEFAULT 1);
                                 ");
 
-                // Creëer de tabel 'Notities'
-                _connection.Execute(@"
+                    // Creëer de tabel 'Notities'
+                    await _connection.ExecuteAsync(@"
                                 CREATE TABLE IF NOT EXISTS Notitie (
                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 Tekst TEXT,
@@ -50,44 +43,62 @@ namespace WerfLogDal
                                 FOREIGN KEY (WerfId) REFERENCES Werf(Id) ON DELETE CASCADE); 
                                 ");
 
-                // Creëer de tabel 'Tijdregistraties'
-                _connection.Execute(@"
+                    // Creëer de tabel 'Tijdregistraties'
+                    await _connection.ExecuteAsync(@"
                                 CREATE TABLE IF NOT EXISTS Tijdregistratie (
                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 StartTijd DATETIME,
                                 StopTijd DATETIME,
+                                WerfNaamRegistratie TEXT,
                                 WerfId INTEGER,
                                 FOREIGN KEY (WerfId) REFERENCES Werf(Id) ON DELETE SET NULL); 
                                 ");
 
-                // Creëer de tabel 'ProjectOverleg'
-                _connection.Execute(@"
+                    // Creëer de tabel 'ProjectOverleg'
+                    await _connection.ExecuteAsync(@"
                                 CREATE TABLE IF NOT EXISTS ProjectOverleg (
                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 Datum DATETIME,
                                 Tekst TEXT);
                                 ");
 
-                _initialized = true;
+                    _initialized = true;
+                }
             }
-
-            
-        }
-
-        public SQLiteConnection GetConnection()
-        {
-            _connection = new SQLiteConnection(Constants.DatabasePath, Constants.Flags);
-            Init();
-            return _connection;
-        }
-        public void Dispose()
-        {
-            if (_connection != null)
+            catch (SQLiteException ex)
             {
-                _connection.Close();
-                _connection.Dispose();
-                _connection = null;
+                throw new DatabaseException("Fout bij aanmaken van databank.", ex);
             }
+
+            catch (Exception ex)
+            {
+                throw new Exception("Algemene fout bij aanmaken databank.", ex);
+            }  
         }
+
+        public async Task<SQLiteAsyncConnection> GetConnectionAsync()
+        {
+            try
+            {
+                if (_connection == null)
+                {
+                    _connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
+                }
+
+                await Init();
+                return _connection;
+            }
+            catch (SQLiteException ex)
+            {
+                throw new DatabaseException("Fout bij verbinden met databank.", ex);
+            }
+
+            catch (Exception ex)
+            {
+               throw new Exception("Algemene Fout bij verbinden met databank.", ex);
+            }
+           
+        }
+
     }
 }

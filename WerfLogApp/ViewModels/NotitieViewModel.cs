@@ -1,22 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
+using WerfLogDal.Exceptions;
 
 namespace WerfLogApp.ViewModels
 {
-
-    //[QueryProperty("Text", "text")]
-
+    
     [QueryProperty("WerfNavigatieId", "werfNavigatieId")]
     [QueryProperty("WerfNaam", "werfNaam")]
     public partial class NotitieViewModel : ObservableObject 
     {
         private INotitieManager _notitieManager;
-
-        //[ObservableProperty]
-        //string text; //id van werf
 
         [ObservableProperty]
         string werfNavigatieId;
@@ -26,7 +21,6 @@ namespace WerfLogApp.ViewModels
 
         [ObservableProperty]
         private string _nieuweNotitieText; //achterliggend wordt een public NieuweNotitieText aangemaakt. 
-
 
         //private field
         private ObservableCollection<NotitieDto> _notities;
@@ -42,65 +36,126 @@ namespace WerfLogApp.ViewModels
             }
         }
 
-
         public NotitieViewModel(INotitieManager notitieManager)
         {
             _notitieManager = notitieManager;
-
-            Notities = new ObservableCollection<NotitieDto>()
-            {
-                new NotitieDto {Id= 1, WerfId = 6,Datum = DateTime.Now, Tekst ="Hier kan er wel nog meer gebeuren, het is altijd hetzelfde met deze werf."},
-                new NotitieDto {Id= 2, WerfId = 7,Datum = DateTime.Now, Tekst ="Hier kan er wel nog meer gebeuren, het is altijd hetzelfde met deze werf."},
-                new NotitieDto {Id= 3, WerfId = 8,Datum = DateTime.Now, Tekst ="Hier kan er wel nog meer gebeuren, het is altijd hetzelfde met deze werf."},
-            };
+            Notities = new ObservableCollection<NotitieDto>();
         }
 
-        public NotitieViewModel()
-        {
+        //COMMAND NOTITIE AANMAKEN
+        public Command VoegNotitieToeCommand => new Command(async() => await NotitieAanmakenAsync());
 
-        }
-
-
-        //aanmaken 
-        public Command VoegNotitieToeCommand => new Command(NotitieAanmaken);
-
-        public void NotitieAanmaken()
+        //METHODE NOTITIE AANMAKEN
+        public async Task NotitieAanmakenAsync()
         {
             if (!string.IsNullOrEmpty(NieuweNotitieText))
             {
-                var notitieDto = new NotitieDto { Id= null, WerfId = int.Parse(WerfNavigatieId), Datum = DateTime.Now, Tekst = NieuweNotitieText }; //Text is Id
-                var toegevoegdeNotitieDto = _notitieManager.AddNotitie(notitieDto);
-
-                if(toegevoegdeNotitieDto != null )
+                var notitieDto = new NotitieDto
                 {
-                    Notities.Insert(0, toegevoegdeNotitieDto);
-                    NieuweNotitieText = string.Empty; // Clear the text after adding
+                    Id = null,
+                    WerfId = int.Parse(WerfNavigatieId),
+                    Datum = DateTime.Now,
+                    Tekst = NieuweNotitieText
+                };
+
+                try
+                {
+                    // Voeg de notitie toe en krijg de bijgewerkte NotitieDto terug (met de nieuwe ID)
+                    var toegevoegdeNotitieDto = await _notitieManager.AddNotitieAsync(notitieDto);
+
+                    if (toegevoegdeNotitieDto != null)
+                    {
+                        // De notitie is succesvol toegevoegd aan de database.
+                        Notities.Insert(0, toegevoegdeNotitieDto);
+
+                        // Maak het invoerveld leeg
+                        NieuweNotitieText = string.Empty;
+                    }
+                    else
+                    {
+                        // Handel de situatie af als het toevoegen mislukt.
+                        await ShowErrorMessage("Het toevoegen van de notitie is mislukt.");
+                    }
                 }
-               
+                catch (DatabaseException ex)
+                {
+                    // Specifieke afhandeling voor databasegerelateerde fouten.
+                    await ShowErrorMessage($"Databasefout: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    // Algemene foutafhandeling.
+                    await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                }
+            }
+            else
+            {
+                await ShowErrorMessage("Notitietekst mag niet leeg zijn.");
             }
         }
 
-        //verwijderen
+        //METHODE ALLE NOTITIES VAN DESBETREFFENDE WERF LADEN, BIJ NAVIGATIE. (Zie code behind -> onappearing)
+        public async Task LoadNotitiesAsync()
+        {
+            if (!string.IsNullOrEmpty(WerfNavigatieId))
+            {
+                try
+                {
+                    var werfId = int.Parse(WerfNavigatieId);
+                    var notitiesVanWerf = await _notitieManager.GetAllNotities(werfId);
 
-        //public Command DeleteNotitieCommand => new Command<Notitie>(NotitieVerwijderen);
-        //public  void NotitieVerwijderen(Notitie notitie)
-        //{
-        //    Notities.Remove(notitie);
-        //}
+                    // Wis de bestaande notities en voeg de nieuwe notities toe
+                    Notities.Clear();
+                    foreach (var notitie in notitiesVanWerf)
+                    {
+                        Notities.Add(notitie);
+                    }
+                }
+                catch (DatabaseException ex)
+                {
+                    // Specifieke afhandeling voor databasegerelateerde fouten.
+                    await ShowErrorMessage($"Databasefout: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    // Algemene foutafhandeling.
+                    await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                }
+            }
+            else
+            {
+                await ShowErrorMessage("WerfNavigatieId is niet toegewezen.");
+            }
+        }
 
+        //COMMAND NOTITIE VERWIJDEREN
         public Command DeleteNotitieCommand => new Command<NotitieDto>(NotitieVerwijderen);
+
+        //METHODE NOTITIE VERWIJDEREN
         public void NotitieVerwijderen(NotitieDto notitie)
         {
             Notities.Remove(notitie);
         }
 
-        //navigatie vorige pagina
+        //COMMAND NAVIGATIE NAAR MAINPAGE
+        public Command GoBackCommand => new Command(GoBack);
+        //METHODE NAVIGATIE NAAR MAINPAGE
         public async void GoBack()
         {
-            await Shell.Current.GoToAsync("..");
+            try
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+            catch (Exception ex)
+            {
+                await ShowErrorMessage("Fout bij navigeren naar mainpage.");
+            } 
         }
-        public ICommand GoBackCommand => new Command(GoBack);
-
-    
+ 
+        //ERROR POPUP IN VIEW
+        private async Task ShowErrorMessage(string message)
+        {
+            await App.Current.MainPage.DisplayAlert("Fout", message, "OK");
+        }
     }
 }

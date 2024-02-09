@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace WerfLogDal.Models
 {
+
+    
     public class BaseModel
     {
+       
+
         public int? Id { get; set; } 
         //voor generic
     }

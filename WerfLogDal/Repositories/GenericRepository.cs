@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
 
@@ -7,11 +8,69 @@ namespace WerfLogDal.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseModel
     {
-        private readonly DbContext _context;
+        internal readonly DbContext _context;
 
         public GenericRepository(DbContext context) 
         {
             _context = context;
+        }
+
+
+        public async Task InsertWithNoReturnAsync(T entity)
+        {
+            try
+            {
+                SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+                connection.InsertAsync(entity);
+            }
+            catch (SQLiteException ex)
+            {
+                // Specifieke afhandeling voor SQLite gerelateerde fouten.
+                throw new DatabaseException("Fout tijdens het invoegen van de entiteit in de database.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Afhandeling van andere onverwachte fouten.
+                throw new Exception("Een onverwachte fout is opgetreden tijdens het invoegen van de entiteit.", ex);
+            }
+
+        }
+
+        public async Task<T> InsertWithReturnAsync(T entity)
+        {
+            try
+            {
+                SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+                // Insert the entity into the database.
+                int rowsAffected = await connection.InsertAsync(entity);
+
+                if (rowsAffected > 0)
+                {
+                    // Retrieve the last insert id.
+                    var lastId = await connection.ExecuteScalarAsync<int>("SELECT last_insert_rowid();");
+
+                    // Assign the retrieved id to the entity's Id property.
+                    entity.Id = lastId;
+
+                    // Return the entity with the assigned Id.
+                    return entity;
+                }
+                else
+                {
+                  throw new DatabaseException("Geen rijen toegevoegd aan de database.");
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                // Specifieke afhandeling voor SQLite gerelateerde fouten.
+                throw new DatabaseException("Fout tijdens het invoegen van de entiteit in de database.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Afhandeling van andere onverwachte fouten.
+                throw new Exception("Een onverwachte fout is opgetreden tijdens het invoegen van de entiteit.", ex);
+            }
         }
 
         public int Delete(T entity)
@@ -19,50 +78,38 @@ namespace WerfLogDal.Repositories
             throw new NotImplementedException();
         }
 
-        public List<T> GetAll()
+        public async Task<List<T>> GetAllAsync()
+        {
+            //try
+            //{
+            //    SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+            //    // Verwijder de WHERE-clausule om alle rijen op te halen
+
+            //    string query = $"SELECT * FROM {typeof(T).Name}";
+            //    List<T> entities = await connection.QueryAsync<T>(query);
+
+            //    return entities;
+            //}
+            //catch (SQLiteException ex)
+            //{
+            //    // Specifieke afhandeling voor SQLite gerelateerde fouten.
+            //    throw new Exception("Fout tijdens het ophalen van gegevens uit de database.", ex);
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Afhandeling van andere onverwachte fouten.
+            //    throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van gegevens.", ex);
+            //}
+
+            throw new NotImplementedException();
+        }
+
+
+        public async Task<T>GetById(int id) 
         {
             throw new NotImplementedException();
         }
 
-        public T GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InsertWithNoReturn(T entity)
-        {
-            SQLiteConnection connection = _context.GetConnection();
-
-            connection.Insert(entity);
-
-          
-        }
-
-        public T InsertWithReturn(T entity)
-        {
-            SQLiteConnection connection = _context.GetConnection();
-
-            // Insert the entity into the database.
-            int rows = connection.Insert(entity);
-
-            // Retrieve the last insert id.
-            var lastId = connection.ExecuteScalar<int>("SELECT last_insert_rowid();");
-
-            // Assign the retrieved id to the entity's Id property.
-            entity.Id = lastId;
-
-            // Return the entity with the assigned Id.
-            return entity;
-        }
-
-
-
-
-
-
-        public int Update(T entity)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
