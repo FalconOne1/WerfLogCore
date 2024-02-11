@@ -17,6 +17,8 @@ namespace WerfLogDal.Models
         public DateTime StartTijd { get; set; }
         public DateTime? StopTijd { get; set; }
 
+        public int TotaleTijd { get; set; }
+
         // Expliciet definiëren van de foreign key-naam
         //[ForeignKey(typeof(Werf))]
         public int WerfId { get; set; }

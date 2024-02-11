@@ -3,59 +3,84 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using WerfLogBl.DTOS;
+using WerfLogBl.Interfaces;
 
 namespace WerfLogApp.ViewModels
 {
     public partial class TijdregistratieViewModel : ObservableObject
     {
+        //De volledige collection. -> wordt geobserveerd voor wijzigingen (2Way)
         [ObservableProperty]
-        private ObservableCollection<string> maanden;
+        private ObservableCollection<string> _maanden;
 
         [ObservableProperty]
-        private string geselecteerdeMaand;
+        private ObservableCollection<string> _jaren;
 
         [ObservableProperty]
-        private ObservableCollection<TijdregistratieDto> tijdregistraties;
+        private ObservableCollection<TijdregistratieDto> _tijdregistraties;
 
-        public TijdregistratieViewModel()
+        //Individuele selectie 
+        [ObservableProperty]
+        private string _geselecteerdJaar;
+
+        [ObservableProperty]
+        private string _geselecteerdeMaand;
+
+        [ObservableProperty]
+        private int _totaalUren;
+
+        [ObservableProperty]
+        private TijdregistratieDto _geselecteerdeTijdregistratie;
+
+        private ITijdregistratieManager _tijdregistratieManager;
+
+
+
+
+
+        public TijdregistratieViewModel(ITijdregistratieManager tijdregistratieManager)
         {
-            Maanden = new ObservableCollection<string> { "Januari 2023", "Februari 2023", "Maart 2023" };
-            GeselecteerdeMaand = Maanden[0];
+            _tijdregistratieManager = tijdregistratieManager;
 
-            // Initialiseren van dummy tijdregistraties met fictieve werfnamen
-            Tijdregistraties = new ObservableCollection<TijdregistratieDto>
-            {
-                new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Aaaaaaaaaaaaaaaaa" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" },
-                 new TijdregistratieDto { Id = 1, WerfId = 1, StartTijd = new DateTime(2023, 1, 1, 8, 0, 0), EindTijd = new DateTime(2023, 1, 1, 16, 0, 0), WerfNaamRegistratie = "Werf A" },
-                new TijdregistratieDto { Id = 2, WerfId = 2, StartTijd = new DateTime(2023, 1, 2, 9, 0, 0), EindTijd = new DateTime(2023, 1, 2, 17, 0, 0), WerfNaamRegistratie = "Werf B" }
-            };
+            //Maanden toevoegen aan Picker. --> Deze worden doorgegeven naar BL en DAL voor dynamisch opvragen van registratiedata
+            _maanden = new ObservableCollection<string>(Enumerable.Range(1, 12).Select(m => m.ToString("00"))); // Maanden 
+            //Jaren toevoegen aan Picker.
+            _jaren = new ObservableCollection<string>(Enumerable.Range(DateTime.Now.Year, 12).Select(year => year.ToString()));
         }
 
-        //public void OnStartTimeChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    if (e.PropertyName == nameof(TimePicker.Time))
-        //    {
-        //        var picker = (TimePicker)sender;
-        //        var newTime = picker.Time;
-        //        var item = ... // Zoek je TijdregistratieDto object
+        public Command OverzichtCommand => new Command(async () => await RegistratiesLaden());
 
-        //// Update de tijd van je item
-        //item.StartTijd = new DateTime(item.StartTijd.Year, item.StartTijd.Month, item.StartTijd.Day, newTime.Hours, newTime.Minutes, 0);
+        //METHODE AANMAKEN WERF
+        public async Task RegistratiesLaden()
+        {
+            // Controleer of de geselecteerde maand en jaar niet leeg zijn
+            if (string.IsNullOrEmpty(GeselecteerdeMaand) || string.IsNullOrEmpty(GeselecteerdJaar))
+            {
+                // Doe hier wat je wilt als de maand of jaar niet zijn geselecteerd
+                return;
+            }
 
-        //        // Vergeet niet om eventuele wijzigingen terug te koppelen naar de UI indien nodig
-        //    }
-        //}
+            // Converteer de geselecteerde maand en jaar naar int
+            if (!int.TryParse(GeselecteerdeMaand, out int maand) || !int.TryParse(GeselecteerdJaar, out int jaar))
+            {
+                // Doe hier wat je wilt als de conversie mislukt
+                return;
+            }
+
+            // Laad de tijdregistraties op basis van de geselecteerde maand en jaar
+            var tijdregistraties = await _tijdregistratieManager.GetAlleTijdRegistratiesMaand(maand, jaar);
+
+            // Converteer de lijst naar een ObservableCollection
+            Tijdregistraties = new ObservableCollection<TijdregistratieDto>(tijdregistraties);
+
+            if(tijdregistraties is not null) 
+            
+            {
+               var totaalUren =  await _tijdregistratieManager.GetTotaalTijdRegistratiesMaand(maand, jaar);
+
+                TotaalUren = totaalUren;
+            }
+        }
 
     }
 }

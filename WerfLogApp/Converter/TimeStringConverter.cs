@@ -32,7 +32,7 @@ namespace WerfLogApp.Converter
 
 
 
-        private const string DateTimeFormat = "dd/MM/yyyy\n   HH:mm";
+        private const string DateTimeFormat = "dd/MM/yyyy";
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

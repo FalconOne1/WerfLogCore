@@ -13,5 +13,9 @@ namespace WerfLogBl.Interfaces
         Task VoegStoptijdWerfToe(int actieveTijdId);
 
         Task<TijdregistratieDto> GetActieveTijdregistratieId();
+
+        Task<int> GetTotaalTijdRegistratiesMaand(int maand, int jaar);
+
+        Task<List<TijdregistratieDto>> GetAlleTijdRegistratiesMaand(int maand, int jaar);
     }
 }

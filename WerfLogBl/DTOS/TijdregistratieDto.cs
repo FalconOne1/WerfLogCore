@@ -13,6 +13,7 @@ namespace WerfLogBl.DTOS
         public DateTime StartTijd { get; set; }
         public DateTime? EindTijd { get; set; }
 
+        public int TotaleTijd { get; set; }
         public string WerfNaamRegistratie { get; set; }
     }
 }

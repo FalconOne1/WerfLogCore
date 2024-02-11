@@ -22,8 +22,12 @@ namespace WerfLogDal
 
                 if (!_initialized)
                 {
+
+
                     // Activeer foreign key support
                     await _connection.ExecuteAsync("PRAGMA foreign_keys = ON");
+
+
 
                     // Creëer de tabel 'Werven'
                     await _connection.ExecuteAsync(@"
@@ -49,6 +53,7 @@ namespace WerfLogDal
                                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                                 StartTijd DATETIME,
                                 StopTijd DATETIME,
+                                TotaleTijd INTEGER,
                                 WerfNaamRegistratie TEXT,
                                 WerfId INTEGER,
                                 FOREIGN KEY (WerfId) REFERENCES Werf(Id) ON DELETE SET NULL); 

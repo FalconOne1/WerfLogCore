@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Maui.Controls.Internals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,11 +38,11 @@ namespace WerfLogBl.Managers
                     WerfId = werfId, // Gebruik de waarde van werf.Id hier.
                     StartTijd = DateTime.Now,
                     StopTijd = null,
-                    WerfNaamRegistratie = werfNaam
-                    
-    };
+                    WerfNaamRegistratie = werfNaam,
+                    TotaleTijd = 0
+                };
 
-                 Tijdregistratie nieuweTijdregistratie = await _tijdRepository.InsertWithReturnAsync(tijdregistratie);
+                Tijdregistratie nieuweTijdregistratie = await _tijdRepository.InsertWithReturnAsync(tijdregistratie);
 
                 return (int)nieuweTijdregistratie.Id;
             }
@@ -65,6 +66,25 @@ namespace WerfLogBl.Managers
             
            return _mapper.Map<TijdregistratieDto>(sessie);
           
+        }
+
+
+
+
+        public async Task<int> GetTotaalTijdRegistratiesMaand(int maand, int jaar)
+        {
+            int totaal = await _tijdRepository.HaalTotaalUrenOpPerMaand(maand, jaar);
+
+            return totaal;
+        }
+
+        public async Task<List<TijdregistratieDto>> GetAlleTijdRegistratiesMaand(int maand, int jaar)
+        {
+            List<Tijdregistratie> tijdregistraties = await _tijdRepository.HaalAlleTijdregistratiesOpPerMaand(maand, jaar);
+
+            List<TijdregistratieDto> tijdregistratiesDto = _mapper.Map<List<TijdregistratieDto>>(tijdregistraties);
+
+            return tijdregistratiesDto;
         }
 
 
