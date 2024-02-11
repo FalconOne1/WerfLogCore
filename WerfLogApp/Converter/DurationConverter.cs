@@ -9,7 +9,7 @@ namespace WerfLogApp.Converter
 {
     public  class DurationConverter : IValueConverter
     {
-
+        //Omzetten TotaalUren van INT naar String en visa versa, in applicatielaag --> in samenwerking met XAML
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is int minutes)
@@ -20,7 +20,6 @@ namespace WerfLogApp.Converter
             }
             return "0u 0m";
         }
-
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is string strValue)
@@ -34,6 +33,4 @@ namespace WerfLogApp.Converter
             return 0;
         }
     }
-
-
 }

@@ -28,10 +28,6 @@ namespace WerfLogBl.Managers
                 // Voeg de Werf toe aan de database en wacht op het resultaat.
                 Werf nieuweWerf = await _werfRepository.InsertWithReturnAsync(werf);
 
-                //voeg dezelfde werf toe aan de WerfCopyTabel --> hier hangen tijdregistraties van af, anders problemen indien een werf verwijderd wordt.
-
-
-
                 // Map het resultaat (Werf) terug naar WerfDto.
                 WerfDto nieuweWerfDto = _mapper.Map<WerfDto>(nieuweWerf);
 
@@ -47,18 +43,23 @@ namespace WerfLogBl.Managers
             }
         }
 
-
-
         public async Task<List<WerfDto>> HaalAlleWervenOp()
         {
-           List<Werf> werven =  await _werfRepository.GetAllWervenAsync();
-
-            List<WerfDto> wervenDto = _mapper.Map<List<WerfDto>>(werven);
-
-            return wervenDto;
+            try
+            {
+                List<Werf> werven = await _werfRepository.GetAllWervenAsync();
+                List<WerfDto> wervenDto = _mapper.Map<List<WerfDto>>(werven);
+                return wervenDto;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            } 
         }
-
-
     }
 
 

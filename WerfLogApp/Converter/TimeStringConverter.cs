@@ -10,27 +10,7 @@ namespace WerfLogApp.Converter
    
         public class TimeStringConverter : IValueConverter
         {
-        //public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        //{
-        //    if (value is TimeSpan time)
-        //    {
-        //        return time.ToString(@"hh\:mm");
-        //    }
-        //    return string.Empty;
-        //}
-
-        //public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        //{
-        //    if (TimeSpan.TryParseExact(value?.ToString(), @"hh\:mm", CultureInfo.InvariantCulture, out TimeSpan result))
-        //    {
-        //        return result;
-        //    }
-        //    return TimeSpan.Zero;
-        //}
-        // Het formaat waarin u wilt dat gebruikers de datum en tijd invoeren.
-        // Dit voorbeeld gebruikt het formaat "dd/MM/yyyy HH:mm", maar u kunt dit aanpassen.
-
-
+        //Omzetten van DATETIME naar String en visa versa, in applicatielaag --> in samenwerking met XAML
 
         private const string DateTimeFormat = "dd/MM/yyyy";
 
@@ -50,7 +30,7 @@ namespace WerfLogApp.Converter
                 return dateTime;
             }
             // Signaleer een ongeldige invoer.
-            return null; // Of gooi een exception, afhankelijk van uw foutafhandelingsstrategie.
+            return null; 
         }
     }
 

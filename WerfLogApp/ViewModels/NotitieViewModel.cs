@@ -137,20 +137,20 @@ namespace WerfLogApp.ViewModels
             Notities.Remove(notitie);
         }
 
-        //COMMAND NAVIGATIE NAAR MAINPAGE
-        public Command GoBackCommand => new Command(GoBack);
-        //METHODE NAVIGATIE NAAR MAINPAGE
-        public async void GoBack()
-        {
-            try
-            {
-                await Shell.Current.GoToAsync("..");
-            }
-            catch (Exception ex)
-            {
-                await ShowErrorMessage("Fout bij navigeren naar mainpage.");
-            } 
-        }
+        ////COMMAND NAVIGATIE NAAR MAINPAGE
+        //public Command GoBackCommand => new Command(GoBack);
+        ////METHODE NAVIGATIE NAAR MAINPAGE
+        //public async void GoBack()
+        //{
+        //    try
+        //    {
+        //        await Shell.Current.GoToAsync("..");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await ShowErrorMessage("Fout bij navigeren naar mainpage.");
+        //    } 
+        //}
  
         //ERROR POPUP IN VIEW
         private async Task ShowErrorMessage(string message)

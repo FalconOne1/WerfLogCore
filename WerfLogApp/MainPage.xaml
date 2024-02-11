@@ -1,7 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:WerfLogApp.Converter"
              x:Class="WerfLogApp.MainPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:TextColorConverter x:Key="TextColorConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
 
     <!-- Hoofd Grid voor de hele pagina -->
     <Grid RowSpacing="0" BackgroundColor="FloralWhite">
@@ -37,7 +45,7 @@
                 </Image.GestureRecognizers>
             </Image>-->
 
-            <Image Source="meeting2_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="55" VerticalOptions="Start" Margin="4,10,0,0">
+            <Image Source="zandloper_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="45" VerticalOptions="Start" Margin="5,12,0,0">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding TijdRegistratieCommand}" NumberOfTapsRequired="1"/>
                 </Image.GestureRecognizers>
@@ -46,10 +54,10 @@
 
 
             <!-- Hoofdafbeelding in het midden -->
-            <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center"/>
+            <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center" Margin="17,0,0,0"/>
 
             <!-- Rechter Logo met TapGestureRecognizer -->
-            <Image Source="zandloper_logo.png" Grid.Column="2" Aspect="AspectFit" HeightRequest="45"  VerticalOptions="Start" Margin="0,13,10,0">
+            <Image Source="meeting2_logo.png" Grid.Column="2" Aspect="AspectFit" HeightRequest="58"  VerticalOptions="Start" Margin="0,4,10,0">
                 <Image.GestureRecognizers>
                     <!--<TapGestureRecognizer Tapped="RechterLogo_Tapped"/>-->
                 </Image.GestureRecognizers>
@@ -121,7 +129,7 @@
         </ScrollView>
 
         <!-- Footer met logo's en timer -->
-        <Grid Grid.Row="3" Padding="30,20,30,25" VerticalOptions="End">
+        <Grid Grid.Row="3" Padding="25,20,25,17" VerticalOptions="End">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <!-- Voor het linker logo -->
@@ -131,18 +139,21 @@
                 <!-- Voor het rechter logo -->
             </Grid.ColumnDefinitions>
 
-            <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="50" WidthRequest="50" HorizontalOptions="Start">
+            <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="40" WidthRequest="40" HorizontalOptions="Start">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding GroeneKnopCommand}" NumberOfTapsRequired="2"/>
                 </Image.GestureRecognizers>
             </Image>
 
             <!-- Timer Label -->
-            <Label x:Name="TimerLabel" Text="{Binding TimerLabelText}" Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Label x:Name="TimerLabel" Text="{Binding TimerLabelText}" 
+                     TextColor="{Binding TimerLabelText, Converter={StaticResource TextColorConverter}}"
+                     Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center" />
+
 
 
             <!-- Rechter Chrono Image met TapGestureRecognizer -->
-            <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="50" WidthRequest="50" HorizontalOptions="End">
+            <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="40" WidthRequest="40" HorizontalOptions="End">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding RodeKnopCommand}" NumberOfTapsRequired="2"/>
                 </Image.GestureRecognizers>

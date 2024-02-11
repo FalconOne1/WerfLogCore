@@ -1,9 +1,4 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
@@ -14,10 +9,8 @@ namespace WerfLogDal.Repositories
     {
         public TijdregistratieRepository(DbContext connection) : base (connection)
         {
-
         }
 
-        
         public async Task UpdateStopTijdById(int id, DateTime stopTijd)
         {
             try
@@ -30,7 +23,6 @@ namespace WerfLogDal.Repositories
                 {
                     throw new Exception($"Geen Tijdregistratie gevonden met id: {id}.");
                 }
-
                 // Bereken de TotaleTijd in minuten, als de EindTijd niet null is.
                 TimeSpan duur = stopTijd - tijdregistratie.StartTijd;
                 int totaleTijdInMinuten = (int)duur.TotalMinutes;
@@ -57,7 +49,6 @@ namespace WerfLogDal.Repositories
                 throw new Exception("Een onverwachte fout is opgetreden tijdens het bijwerken van de StopTijd en TotaleTijd.", ex);
             }
         }
-
 
         public async Task<Tijdregistratie> GetEmptyStopDateTimeAsync()
         {
@@ -125,14 +116,13 @@ namespace WerfLogDal.Repositories
                                 WHERE strftime('%Y', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Jaar 
                                 AND strftime('%m', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Maand;";
 
-                // Bereid het command voor en voer het uit met de parameters
+                // Kan beter door te werken met paramaeters SQL injection! (Voor deze app niet belangrijk)
                 var totaleDuurInMinuten = await connection.ExecuteScalarAsync<int?>(query, jaar.ToString(), maand.ToString("00"));
-
 
                 // Controleer of er een resultaat is en bereken het totaal aantal uren.
                 if (totaleDuurInMinuten.HasValue)
                 {
-                    return totaleDuurInMinuten.Value; // Als je de duur in minuten hebt, en je wilt uren, moet je misschien delen door 60.
+                    return totaleDuurInMinuten.Value; 
                 }
             }
             catch (SQLiteException ex)
@@ -146,7 +136,7 @@ namespace WerfLogDal.Repositories
                 throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van het totaal aantal uren.", ex);
             }
 
-            return 0; // Geen uren gevonden voor de opgegeven maand en jaar
+            return 0; //Geen uren gevonden voor de opgegeven maand en jaar
         }
 
 
@@ -157,17 +147,14 @@ namespace WerfLogDal.Repositories
                 SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
 
                 var query = @"
-                     SELECT *, datetime(StartTijd / 10000000 - 62135596800, 'unixepoch') AS StartDateTime
-                     FROM Tijdregistratie
-                     WHERE strftime('%Y', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Jaar 
-                     AND strftime('%m', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Maand
-                    ORDER BY StartTijd ASC;
-                     ";
+                                 SELECT *, datetime(StartTijd / 10000000 - 62135596800, 'unixepoch') AS StartDateTime
+                                 FROM Tijdregistratie
+                                 WHERE strftime('%Y', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Jaar 
+                                 AND strftime('%m', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Maand
+                                 ORDER BY StartTijd ASC;";
 
-                // Bereid het commando voor en voer het uit.
+                //Kan beter door te werken met paramaeters SQL injection! (Voor deze app niet belangrijk)
                 var tijdregistraties = await connection.QueryAsync<Tijdregistratie>(query, jaar.ToString(), maand.ToString("00"));
-
-
 
                 // Geef de gevonden tijdregistraties terug.
                 return tijdregistraties;
@@ -183,7 +170,5 @@ namespace WerfLogDal.Repositories
                 throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van de tijdregistraties.", ex);
             }
         }
-
-
     }
 }

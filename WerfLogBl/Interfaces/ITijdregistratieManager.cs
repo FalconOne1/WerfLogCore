@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WerfLogBl.DTOS;
+﻿using WerfLogBl.DTOS;
 
 namespace WerfLogBl.Interfaces
 {
@@ -11,11 +6,8 @@ namespace WerfLogBl.Interfaces
     {
         Task<int> VoegStarttijdWerfToe(WerfDto werf);
         Task VoegStoptijdWerfToe(int actieveTijdId);
-
         Task<TijdregistratieDto> GetActieveTijdregistratieId();
-
         Task<int> GetTotaalTijdRegistratiesMaand(int maand, int jaar);
-
         Task<List<TijdregistratieDto>> GetAlleTijdRegistratiesMaand(int maand, int jaar);
     }
 }

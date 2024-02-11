@@ -1,12 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.Maui.Controls.Internals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
+using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
 
@@ -25,89 +20,146 @@ namespace WerfLogBl.Managers
 
         public async Task<int> VoegStarttijdWerfToe(WerfDto werf)
         {
-            // Controleer of werf.Id een waarde heeft.
-            if (werf.Id.HasValue)
-            {
-                // Haal de waarde op van werf.Id, wetende dat het niet null is.
-                int werfId = werf.Id.Value;
-                string werfNaam = werf.Naam;
 
-                Tijdregistratie tijdregistratie = new Tijdregistratie
+            try
+            {
+                // Controleer of werf.Id een waarde heeft.
+                if (werf.Id.HasValue)
                 {
-                    Id = null, // Voor autoincrement in SQLite.
-                    WerfId = werfId, // Gebruik de waarde van werf.Id hier.
-                    StartTijd = DateTime.Now,
-                    StopTijd = null,
-                    WerfNaamRegistratie = werfNaam,
-                    TotaleTijd = 0
-                };
+                    // Haal de waarde op van werf.Id, wetende dat het niet null is.
+                    int werfId = werf.Id.Value;
+                    string werfNaam = werf.Naam;
 
-                Tijdregistratie nieuweTijdregistratie = await _tijdRepository.InsertWithReturnAsync(tijdregistratie);
+                    Tijdregistratie tijdregistratie = new Tijdregistratie
+                    {
+                        Id = null, // Voor autoincrement in SQLite.
+                        WerfId = werfId, // Gebruik de waarde van werf.Id hier.
+                        StartTijd = DateTime.Now,
+                        StopTijd = null,
+                        WerfNaamRegistratie = werfNaam,
+                        TotaleTijd = 0
+                    };
 
-                return (int)nieuweTijdregistratie.Id;
-            }
-            else
+                    Tijdregistratie nieuweTijdregistratie = await _tijdRepository.InsertWithReturnAsync(tijdregistratie);
+
+                    if (tijdregistratie != null)
+                    {
+                        return (int)nieuweTijdregistratie.Id;
+                    }
+                    else
+                    {
+                        throw new Exception("Fout met werfID");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Fout met werfID");
+                }
+             }
+            catch (DatabaseException ex)
             {
-                throw new Exception("Fout met werfID");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
-
+            
         public async Task VoegStoptijdWerfToe(int actieveTijdId)
         {
-             await _tijdRepository.UpdateStopTijdById(actieveTijdId, DateTime.Now);
-
-
+            try
+            {
+               await _tijdRepository.UpdateStopTijdById(actieveTijdId, DateTime.Now);
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<TijdregistratieDto> GetActieveTijdregistratieId()
         {
-          Tijdregistratie sessie = await _tijdRepository.GetEmptyStopDateTimeAsync();
-
-            
-           return _mapper.Map<TijdregistratieDto>(sessie);
-          
+            try
+            {
+               Tijdregistratie sessie = await _tijdRepository.GetEmptyStopDateTimeAsync();
+               return _mapper.Map<TijdregistratieDto>(sessie);
+            }
+            catch(DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
-
-
-
 
         public async Task<int> GetTotaalTijdRegistratiesMaand(int maand, int jaar)
         {
-            int totaal = await _tijdRepository.HaalTotaalUrenOpPerMaand(maand, jaar);
 
-            return totaal;
+            try
+            {
+                int totaal = await _tijdRepository.HaalTotaalUrenOpPerMaand(maand, jaar);
+                return totaal;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<List<TijdregistratieDto>> GetAlleTijdRegistratiesMaand(int maand, int jaar)
         {
-            List<Tijdregistratie> tijdregistraties = await _tijdRepository.HaalAlleTijdregistratiesOpPerMaand(maand, jaar);
-
-            List<TijdregistratieDto> tijdregistratiesDto = _mapper.Map<List<TijdregistratieDto>>(tijdregistraties);
-
-            return tijdregistratiesDto;
+            try
+            {
+                List<Tijdregistratie> tijdregistraties = await _tijdRepository.HaalAlleTijdregistratiesOpPerMaand(maand, jaar);
+                List<TijdregistratieDto> tijdregistratiesDto = _mapper.Map<List<TijdregistratieDto>>(tijdregistraties);
+                return tijdregistratiesDto;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
-
-
 
         public async Task UpdateTijdregistratieTime(int tijdregistratieId, TimeSpan nieuweTijd) //mss met object zelf werken, vermijden van ophalen via id
         {
-          Tijdregistratie tijdregistratie =await _tijdRepository.GetTijdregistratieById(tijdregistratieId);
+            try
+            {
+                Tijdregistratie tijdregistratie = await _tijdRepository.GetTijdregistratieById(tijdregistratieId);
 
-       
-           DateTime nieuweStopTijd = new DateTime(
-                    tijdregistratie.StopTijd.Value.Year,
-                    tijdregistratie.StopTijd.Value.Month,
-                    tijdregistratie.StopTijd.Value.Day,
-                    nieuweTijd.Hours,
-                    nieuweTijd.Minutes,
-                    nieuweTijd.Seconds);
+                DateTime nieuweStopTijd = new DateTime(
+                         tijdregistratie.StopTijd.Value.Year,
+                         tijdregistratie.StopTijd.Value.Month,
+                         tijdregistratie.StopTijd.Value.Day,
+                         nieuweTijd.Hours,
+                         nieuweTijd.Minutes,
+                         nieuweTijd.Seconds);
 
-            // Update de tijd met behoud van de datum
-
-
-            await  _tijdRepository.UpdateStopTijdById(tijdregistratieId, nieuweStopTijd);
+                // Update de tijd met behoud van de datum
+                await _tijdRepository.UpdateStopTijdById(tijdregistratieId, nieuweStopTijd);
             }
-            //}
-
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+    }     
 }

@@ -53,7 +53,6 @@ namespace WerfLogApp.ViewModels
             _werfManager = werfManager;
             _tijdregistratieManager = tijdregistratieManager;
             Werven = new ObservableCollection<WerfDto>();
-            
         }
 
 
@@ -135,35 +134,60 @@ namespace WerfLogApp.ViewModels
                 {
                     await Shell.Current.GoToAsync($"{nameof(NotitiePage)}?werfNavigatieId={werf.Id}&werfNaam={werf.Naam}");
                 }
+               
                 catch (Exception ex)
                 {
-                    await ShowErrorMessage("Fout bij navigeren naar notities");
+                    // Algemene foutafhandeling.
+                    await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
                 }
+            }
+            else
+            {
+                await ShowErrorMessage($"Fout bij het navigeren naar notities.");
             }
         }
 
 
         //ERROR POPUP IN VIEW
         private async Task ShowErrorMessage(string message)
-        { 
-         await App.Current.MainPage.DisplayAlert("Fout", message, "OK");
+        {
+            try
+            {
+                await App.Current.MainPage.DisplayAlert("Fout", message, "OK");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
 
         //COMMAND TIJDSREGISTRATIE START
         public Command GroeneKnopCommand => new Command(async () =>
         {
-           
-            if (GeselecteerdeWerf != null )
+            try
             {
-                // Voer de logica uit voor het opslaan van de datum en tijd
-                await SlaDateTimeOp(GeselecteerdeWerf);
-                
+                if (GeselecteerdeWerf != null)
+                {
+                    // Voer de logica uit voor het opslaan van de datum en tijd
+                    await SlaDateTimeOp(GeselecteerdeWerf);
+                }
+                else
+                {
+                    await ShowErrorMessage($"Selecteer een werf.");
+                }
             }
-            else
+            catch (DatabaseException ex)
             {
-                await ShowErrorMessage($"Selecteer een werf.");
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
             }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+
         });
 
 
@@ -177,20 +201,20 @@ namespace WerfLogApp.ViewModels
                     _actieveTijdRegistratieId = await _tijdregistratieManager.VoegStarttijdWerfToe(werf);
                     _actieveWerf = true;
                     TimerLabelText = "Aanwezig";
-
-
                 }
                 else
                 {
-                    await ShowErrorMessage($"Laatste werf is nog actief, gelieve deze eerst af te sluiten.\n(Controleer uw tijdregistraties en pas zo nodig aan.)"); 
-
-                    //wel opletten dat de naam ook beschikbaar is bij het opnieuw opstarten ! te checken
+                    await ShowErrorMessage($"Laatste werf is nog actief, gelieve deze eerst af te sluiten."); 
                 }
-             
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
             }
             catch (Exception ex)
             {
-                // Toon foutmelding
+                // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
         }
@@ -198,19 +222,30 @@ namespace WerfLogApp.ViewModels
         //COMMAND TIJDSREGISTRATIE STOP
         public Command RodeKnopCommand => new Command(async () =>
         {
-
-            if (_actieveWerf)
+            try
             {
-                // Voer de logica uit voor het opslaan van de datum en tijd
-                await SlaStopDateTimeOp(_actieveTijdRegistratieId);
-               
+                if (_actieveWerf)
+                {
+                    // Voer de logica uit voor het opslaan van de datum en tijd
+                    await SlaStopDateTimeOp(_actieveTijdRegistratieId);
+                }
+                else
+                {
+                    // Toon foutmelding
+                    await ShowErrorMessage($"Geen werf actief.");
+                }
             }
-            else
+            catch (DatabaseException ex)
             {
-                // Toon een foutmelding of maak de knop inactief als er geen werf geselecteerd is
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
         });
-
 
         // Methode om de datum en tijd op te slaan
         private async Task SlaStopDateTimeOp(int actieveTijdId)
@@ -220,14 +255,23 @@ namespace WerfLogApp.ViewModels
                 if (actieveTijdId != 0 )
                 {
                  await _tijdregistratieManager.VoegStoptijdWerfToe(actieveTijdId);
-                    _actieveWerf = false;
-                    TimerLabelText = "Afwezig";
+                       _actieveWerf = false;
+                       TimerLabelText = "Afwezig";
+                }
+                else
+                {
+                 await ShowErrorMessage($"Er is een fout opgetreden bij het opslaan.");
                 }
 
             }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
             catch (Exception ex)
             {
-                // Toon foutmelding
+                // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
         }
@@ -236,47 +280,66 @@ namespace WerfLogApp.ViewModels
         {
             try
             {
-
-               
                 // Haal de actieve tijdregistratie op (waar StopTijd nog NULL is)
                 var actieveTijdregistratie = await _tijdregistratieManager.GetActieveTijdregistratieId();
 
+                //Indien geen actieve tijdregistratie meer, doe niets.
                 if(actieveTijdregistratie == null)
                 {
                     return;
                 }
 
+                //Bij opstarten, toon aanwezigheid op werf en biedt de mogelijkheid om werf te beeindigen.
                 _actieveTijdRegistratieId = (int)actieveTijdregistratie.Id;
                 _actieveWerf = true;
                 TimerLabelText = "Aanwezig";
 
-
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
             }
             catch (Exception ex)
             {
-                // Foutafhandeling
+                // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
-                
             }
         }
 
         public async Task HaalAlleWervenOpAsync()
         {
-            if (!_isDataGeladen)
+            try
             {
-                var wervenDto = await _werfManager.HaalAlleWervenOp();
-                foreach (var werfDto in wervenDto)
+                if (!_isDataGeladen)
                 {
-                    Werven.Add(werfDto);
-                }
-                _isDataGeladen = true;
+                    var wervenDto = await _werfManager.HaalAlleWervenOp();
 
-                if (Werven.Count > 0)
-                {
-                    await IsErNogEenLopendeTijdRegistratieVanWerf();
-                  
+                    foreach (var werfDto in wervenDto)
+                    {
+                        Werven.Add(werfDto);
+                    }
+
+                        _isDataGeladen = true;
+
+                    if (Werven.Count > 0)
+                    {
+                        await IsErNogEenLopendeTijdRegistratieVanWerf();
+                    }
                 }
             }
+
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+
         }
         public Command TijdRegistratieCommand => new Command(async () => await TapTijdRegistratie());
 
@@ -290,7 +353,7 @@ namespace WerfLogApp.ViewModels
             }
             catch (Exception ex)
             {
-                // Log of toon fout
+                await ShowErrorMessage($"Er is een fout opgetreden bij het navigeren naar tijdregistraties.");
             }
         }
 

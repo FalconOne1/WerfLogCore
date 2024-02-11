@@ -22,19 +22,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackLayout Grid.Row="0" VerticalOptions="Start" Padding="10,5">
-            <Image Source="boek_penseel_logo.png" Aspect="AspectFit" HeightRequest="150"/>
+        <StackLayout Grid.Row="0" VerticalOptions="Start" Padding="10,5,0,20">
+            <Image Source="zandloper_logo.png" Aspect="AspectFit" HeightRequest="100"/>
         </StackLayout>
 
-        <Grid Grid.Row="1" ColumnSpacing="10" Padding="10,10">
+        <Grid Grid.Row="1" ColumnSpacing="10" Padding="10,0,0,10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
             <Picker Grid.Column="0" Title="Maand" ItemsSource="{Binding Maanden}"  SelectedItem="{Binding GeselecteerdeMaand,Mode=TwoWay}" HorizontalOptions="Start"/>
             <Picker Grid.Column="1" Title="Jaar" ItemsSource="{Binding Jaren}" SelectedItem="{Binding GeselecteerdJaar,Mode=TwoWay}" HorizontalOptions="Start"/>
-            <Button Grid.Column="2" Text="Overzicht" Command="{Binding OverzichtCommand}" Margin="0,10,0,0" HeightRequest="30"/>
+            <Button Grid.Column="2" Text="Overzicht" Command="{Binding OverzichtCommand}" Margin="0,10,0,0" HeightRequest="37" BackgroundColor="DarkSlateGrey" TextColor="White" />
         </Grid>
 
 
@@ -44,9 +44,9 @@
                 <DataTemplate>
                     <Grid Padding="5" ColumnSpacing="25" Margin="0,5,10,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <!-- Aangepast naar StartTijd en gebruikt de TimeStringConverter voor alleen de datum -->
                         <Label Grid.Column="0" Text="{Binding StartTijd, Converter={StaticResource TimeStringConverter}}" HorizontalOptions="Start" VerticalOptions="Center"/>
@@ -60,10 +60,17 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <!-- Grid totaal uur -->
+        <Grid Grid.Row="3" Margin="5,15,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="3" Text="{Binding TotaalUren, Converter={StaticResource DurationConverter}}" HorizontalOptions="Center" VerticalOptions="End" Margin="10"/>
+            <Label Grid.Column="0" Text="Totaal:" HorizontalOptions="End" VerticalOptions="Center" Margin="10,0,0,10"/>
+            <Label Grid.Column="1" Text="{Binding TotaalUren, Converter={StaticResource DurationConverter}}" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,0,0,10"/>
+        </Grid>
 
-        <Button Grid.Row="4" Text="Terug naar Overzicht" Command="{Binding GoBackCommand}" HorizontalOptions="Center" VerticalOptions="End" Margin="20" WidthRequest="200" HeightRequest="50" BackgroundColor="DarkSlateGrey" TextColor="White"/>
     </Grid>
 </ContentPage>
 

@@ -5,7 +5,6 @@ namespace WerfLogDal
 {
     public class DbContext /*:IDisposable*/
     {
-
         private SQLiteAsyncConnection _connection;
         private bool _initialized = false;
 
@@ -14,20 +13,15 @@ namespace WerfLogDal
             //_/*connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);*/
               //GetConnectionAsync();
         }
-
         private async Task Init()
         {
             try
             {
-
                 if (!_initialized)
                 {
 
-
                     // Activeer foreign key support
                     await _connection.ExecuteAsync("PRAGMA foreign_keys = ON");
-
-
 
                     // Creëer de tabel 'Werven'
                     await _connection.ExecuteAsync(@"
@@ -80,7 +74,6 @@ namespace WerfLogDal
                 throw new Exception("Algemene fout bij aanmaken databank.", ex);
             }  
         }
-
         public async Task<SQLiteAsyncConnection> GetConnectionAsync()
         {
             try
@@ -89,7 +82,6 @@ namespace WerfLogDal
                 {
                     _connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
                 }
-
                 await Init();
                 return _connection;
             }
@@ -102,8 +94,6 @@ namespace WerfLogDal
             {
                throw new Exception("Algemene Fout bij verbinden met databank.", ex);
             }
-           
         }
-
     }
 }
