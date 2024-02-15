@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
+using WerfLogDal.Exceptions;
 
 namespace WerfLogApp.ViewModels
 {
@@ -34,10 +37,6 @@ namespace WerfLogApp.ViewModels
 
         private ITijdregistratieManager _tijdregistratieManager;
 
-
-
-
-
         public TijdregistratieViewModel(ITijdregistratieManager tijdregistratieManager)
         {
             _tijdregistratieManager = tijdregistratieManager;
@@ -53,36 +52,99 @@ namespace WerfLogApp.ViewModels
         //METHODE AANMAKEN WERF
         public async Task RegistratiesLaden()
         {
-            // Controleer of de geselecteerde maand en jaar niet leeg zijn
-            if (string.IsNullOrEmpty(GeselecteerdeMaand) || string.IsNullOrEmpty(GeselecteerdJaar))
+            try
             {
-                // Doe hier wat je wilt als de maand of jaar niet zijn geselecteerd
-                return;
-            }
 
-            // Converteer de geselecteerde maand en jaar naar int
-            if (!int.TryParse(GeselecteerdeMaand, out int maand) || !int.TryParse(GeselecteerdJaar, out int jaar))
+                // Controleer of de geselecteerde maand en jaar niet leeg zijn
+                if (string.IsNullOrEmpty(GeselecteerdeMaand) || string.IsNullOrEmpty(GeselecteerdJaar))
+                {
+                    // Doe hier wat je wilt als de maand of jaar niet zijn geselecteerd
+                    return;
+                }
+
+                // Converteer de geselecteerde maand en jaar naar int
+                if (!int.TryParse(GeselecteerdeMaand, out int maand) || !int.TryParse(GeselecteerdJaar, out int jaar))
+                {
+                    // Doe hier wat je wilt als de conversie mislukt
+                    return;
+                }
+
+                // Laad de tijdregistraties op basis van de geselecteerde maand en jaar
+                var tijdregistraties = await _tijdregistratieManager.GetAlleTijdRegistratiesMaand(maand, jaar);
+
+                if (tijdregistraties.Count == 0 || tijdregistraties is null)
+                {
+                    await ShowErrorMessage($"Geen opgeslagen tijdregistraties voor maand en jaar.");
+                }
+                else
+                {
+                    // Converteer de lijst naar een ObservableCollection
+                    Tijdregistraties = new ObservableCollection<TijdregistratieDto>(tijdregistraties);
+                    var totaalUren = await _tijdregistratieManager.GetTotaalTijdRegistratiesMaand(maand, jaar);
+                    TotaalUren = totaalUren;
+                }
+            }
+            catch (DatabaseException ex)
             {
-                // Doe hier wat je wilt als de conversie mislukt
-                return;
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
             }
-
-            // Laad de tijdregistraties op basis van de geselecteerde maand en jaar
-            var tijdregistraties = await _tijdregistratieManager.GetAlleTijdRegistratiesMaand(maand, jaar);
-
-            // Converteer de lijst naar een ObservableCollection
-            Tijdregistraties = new ObservableCollection<TijdregistratieDto>(tijdregistraties);
-
-            if(tijdregistraties is not null) 
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
             
-            {
-               var totaalUren =  await _tijdregistratieManager.GetTotaalTijdRegistratiesMaand(maand, jaar);
-
-                TotaalUren = totaalUren;
-            }
         }
 
+
+        public Command<TijdregistratieDto> EditCommand => new Command<TijdregistratieDto>(async (tijdregistratieDto) => await EditTijdregistratie(tijdregistratieDto));
+
+
+        private async Task EditTijdregistratie(TijdregistratieDto tijdregistratie)
+        {
+            try
+            {
+                if (tijdregistratie != null)
+                {
+                    try
+                    {
+                        await Shell.Current.GoToAsync($"{nameof(TijdregistratieEditPage)}?tijdregistratieId={tijdregistratie.Id}");
+                        // Voeg eventuele andere parameters toe die je nodig hebt
+                    }
+                    catch (Exception ex)
+                    {
+                        // Algemene foutafhandeling.
+                        //await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    //await ShowErrorMessage("Fout bij het navigeren naar de edit pagina.");
+                }
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+            
+        }
+
+        //ERROR POPUP IN VIEW
+        private async Task ShowErrorMessage(string message)
+        {
+            await App.Current.MainPage.DisplayAlert("Fout", message, "OK");
+        }
     }
 }
+
+
+
 
 

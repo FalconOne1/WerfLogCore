@@ -55,7 +55,7 @@ namespace WerfLogBl.Managers
                 {
                     throw new Exception("Fout met werfID");
                 }
-             }
+            }
             catch (DatabaseException ex)
             {
                 throw;
@@ -65,12 +65,12 @@ namespace WerfLogBl.Managers
                 throw;
             }
         }
-            
+
         public async Task VoegStoptijdWerfToe(int actieveTijdId)
         {
             try
             {
-               await _tijdRepository.UpdateStopTijdById(actieveTijdId, DateTime.Now);
+                await _tijdRepository.UpdateStopTijdById(actieveTijdId, DateTime.Now);
             }
             catch (DatabaseException ex)
             {
@@ -86,10 +86,10 @@ namespace WerfLogBl.Managers
         {
             try
             {
-               Tijdregistratie sessie = await _tijdRepository.GetEmptyStopDateTimeAsync();
-               return _mapper.Map<TijdregistratieDto>(sessie);
+                Tijdregistratie sessie = await _tijdRepository.GetEmptyStopDateTimeAsync();
+                return _mapper.Map<TijdregistratieDto>(sessie);
             }
-            catch(DatabaseException ex)
+            catch (DatabaseException ex)
             {
                 throw;
             }
@@ -161,5 +161,44 @@ namespace WerfLogBl.Managers
                 throw;
             }
         }
-    }     
+
+        public async Task<TijdregistratieDto> GetTijdregistratieById(int id)
+        {
+            try
+            {
+                Tijdregistratie tijdregistratie = await _tijdRepository.GetTijdregistratieById(id);
+                TijdregistratieDto dto = _mapper.Map<TijdregistratieDto>(tijdregistratie);
+
+                return dto;
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+        public async Task UpdateTijdregistratie(int id, TijdregistratieDto tijdregistratieDto)
+        {
+
+            try
+            {
+                Tijdregistratie tijdregistratie = _mapper.Map<Tijdregistratie>(tijdregistratieDto);
+                await _tijdRepository.UpdateTijdregistratieById(id, tijdregistratie);
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+    }
 }
+

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:WerfLogApp.Converter"
+             x:Class="WerfLogApp.TijdregistratieEditPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="FloralWhite">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+          
+           
+            <converters:StringToDateConverter x:Key="StringToDateConverter"/>
+      
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid Padding="10" RowSpacing="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Logo -->
+        <Image Grid.Row="0" Source="zandloper_logo.png" Aspect="AspectFit" HeightRequest="100" HorizontalOptions="Center"/>
+
+        <!-- Formulier voor bewerking -->
+        <Grid Grid.Row="1" RowSpacing="30" Margin="0,50,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+
+                <!-- Voeg meer rijen toe indien nodig -->
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Startdatum en tijd -->
+            <Label Text="Start:" Grid.Row="0" Grid.Column="0" Padding="0,10,20,10"/>
+            <Entry Grid.Row="0" Grid.Column="1" Text="{Binding Tijdregistratie.StartTijd, Converter={StaticResource StringToDateConverter}, Mode=TwoWay}" />
+
+            <!-- Einddatum en tijd -->
+            <Label Text="Einde:" Grid.Row="1" Grid.Column="0" Padding="0,10,20,10"/>
+            <Entry Grid.Row="1" Grid.Column="1" Text="{Binding Tijdregistratie.StopTijd, Converter={StaticResource StringToDateConverter}, Mode=TwoWay}" />
+            <!-- Voeg hier eventueel extra velden toe -->
+
+            <!-- Button voor Opslaan -->
+            <Button Text="Opslaan" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center" Command="{Binding SaveCommand}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

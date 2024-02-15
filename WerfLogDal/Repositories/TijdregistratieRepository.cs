@@ -50,6 +50,41 @@ namespace WerfLogDal.Repositories
             }
         }
 
+        public async Task UpdateTijdregistratieById(int id, Tijdregistratie tijdregistratie)
+        {
+            try
+            {
+                SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+                // Bereken de TotaleTijd in minuten.
+                TimeSpan duur = tijdregistratie.StopTijd.Value - tijdregistratie.StartTijd;
+                int totaleTijdInMinuten = (int)duur.TotalMinutes;
+
+                // Update zowel de StartTijd, StopTijd als de TotaleTijd in de database.
+                string query = "UPDATE Tijdregistratie SET StartTijd = @startTijd, StopTijd = @stopTijd, TotaleTijd = @totaleTijdInMinuten WHERE Id = @id";
+
+                // Voer de update uit.
+                int rowsAffected = await connection.ExecuteAsync(query,tijdregistratie.StartTijd, tijdregistratie.StopTijd, totaleTijdInMinuten, id );
+
+                if (rowsAffected == 0)
+                {
+                    throw new Exception($"Update mislukt voor Tijdregistratie met id: {id}.");
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                // Specifieke afhandeling voor SQLite gerelateerde fouten.
+                throw new DatabaseException("Fout tijdens het bijwerken van de StartTijd, StopTijd en TotaleTijd in de database.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Afhandeling van andere onverwachte fouten.
+                throw new Exception("Een onverwachte fout is opgetreden tijdens het bijwerken van de StartTijd, StopTijd en TotaleTijd.", ex);
+            }
+        }
+
+
+
         public async Task<Tijdregistratie> GetEmptyStopDateTimeAsync()
         {
             try
@@ -80,29 +115,62 @@ namespace WerfLogDal.Repositories
             }
         }
 
+        //public async Task<Tijdregistratie> GetTijdregistratieById(int id)
+        //{
+        //    try
+        //    {
+        //        SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+        //        // Query de entiteit met de opgegeven id uit de database.
+        //        Tijdregistratie tijdregistratie = await connection.FindAsync<Tijdregistratie>(id);
+
+        //        // Retourneer de gevonden entiteit.
+        //        return tijdregistratie;
+        //    }
+        //    catch (SQLiteException ex)
+        //    {
+        //        // Specifieke afhandeling voor SQLite gerelateerde fouten.
+        //        throw new DatabaseException("Fout tijdens het ophalen van de entiteit uit de database.", ex);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Afhandeling van andere onverwachte fouten.
+        //        throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van de entiteit.", ex);
+        //    }
+        //}
+
         public async Task<Tijdregistratie> GetTijdregistratieById(int id)
         {
             try
             {
                 SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
 
-                // Query de entiteit met de opgegeven id uit de database.
-                Tijdregistratie tijdregistratie = await connection.FindAsync<Tijdregistratie>(id);
+                // Schrijf de SQL-query met de parameter placeholder.
+                string query = "SELECT * FROM Tijdregistratie WHERE Id = ?";
 
-                // Retourneer de gevonden entiteit.
+                // Voer de query uit en haal het overeenkomstige object op.
+                var tijdregistratie = await connection.FindWithQueryAsync<Tijdregistratie>(query, id);
+
+                // Controleer of er een resultaat is.
+                if (tijdregistratie == null)
+                {
+                    return null;
+                }
+
                 return tijdregistratie;
             }
             catch (SQLiteException ex)
             {
                 // Specifieke afhandeling voor SQLite gerelateerde fouten.
-                throw new DatabaseException("Fout tijdens het ophalen van de entiteit uit de database.", ex);
+                throw new DatabaseException("Fout tijdens het ophalen van de tijdregistratie uit de database.", ex);
             }
             catch (Exception ex)
             {
                 // Afhandeling van andere onverwachte fouten.
-                throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van de entiteit.", ex);
+                throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van de tijdregistratie.", ex);
             }
         }
+
 
         public async Task<int> HaalTotaalUrenOpPerMaand(int maand, int jaar)
         {
@@ -151,6 +219,7 @@ namespace WerfLogDal.Repositories
                                  FROM Tijdregistratie
                                  WHERE strftime('%Y', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Jaar 
                                  AND strftime('%m', datetime(StartTijd / 10000000 - 62135596800, 'unixepoch')) = @Maand
+                                 AND StopTijd IS NOT NULL
                                  ORDER BY StartTijd ASC;";
 
                 //Kan beter door te werken met paramaeters SQL injection! (Voor deze app niet belangrijk)

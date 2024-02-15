@@ -88,6 +88,9 @@
 	  <MauiXaml Update="NotitiePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="TijdregistratieEditPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="TijdregistratiePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

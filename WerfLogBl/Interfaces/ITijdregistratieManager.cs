@@ -9,5 +9,9 @@ namespace WerfLogBl.Interfaces
         Task<TijdregistratieDto> GetActieveTijdregistratieId();
         Task<int> GetTotaalTijdRegistratiesMaand(int maand, int jaar);
         Task<List<TijdregistratieDto>> GetAlleTijdRegistratiesMaand(int maand, int jaar);
+
+        Task<TijdregistratieDto> GetTijdregistratieById(int id);
+
+        Task UpdateTijdregistratie(int id,TijdregistratieDto tijdregistratieDto);
     }
 }

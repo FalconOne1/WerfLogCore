@@ -17,5 +17,7 @@ namespace WerfLogDal.Interfaces
         Task<int> HaalTotaalUrenOpPerMaand(int jaar, int maand);
 
         Task<List<Tijdregistratie>> HaalAlleTijdregistratiesOpPerMaand(int jaar, int maand);
+
+        Task UpdateTijdregistratieById(int id, Tijdregistratie tijdregistratie);
     }
 }

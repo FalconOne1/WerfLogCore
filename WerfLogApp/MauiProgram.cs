@@ -39,6 +39,8 @@ namespace WerfLogApp
             builder.Services.AddTransient<NotitieViewModel>(); //gegevens uit db eerst opvragen per notitie
             builder.Services.AddTransient<TijdregistratiePage>();
             builder.Services.AddTransient<TijdregistratieViewModel>();
+            builder.Services.AddTransient<TijdregistratieEditPage>();
+            builder.Services.AddTransient<TijdregistratieEditViewModel>();
 
             // Configureer je repositories
             builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
