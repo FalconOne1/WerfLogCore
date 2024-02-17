@@ -73,9 +73,65 @@ namespace WerfLogDal.Repositories
             }
         }
 
-        public int Delete(T entity)
+        //public async Task<int> Delete(T entity)
+        //{
+        //    try
+        //    {
+        //        SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+        //        // Verwijder de entiteit uit de database
+        //        int rowsAffected = await connection.DeleteAsync(entity);
+
+        //        if (rowsAffected > 0)
+        //        {
+        //            return rowsAffected;
+        //        }
+        //        else
+        //        {
+        //            throw new DatabaseException("Geen rijen verwijderd uit de database.");
+        //        }
+        //    }
+        //    catch (SQLiteException ex)
+        //    {
+        //        // Specifieke afhandeling voor SQLite gerelateerde fouten.
+        //        throw new DatabaseException("Fout tijdens het verwijderen van de entiteit uit de database.", ex);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Afhandeling van andere onverwachte fouten.
+        //        throw new Exception("Een onverwachte fout is opgetreden tijdens het verwijderen van de entiteit.", ex);
+        //    }
+        //}
+
+        public async Task<int> Delete(T entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
+
+                // Stel een SQL-delete-query samen
+                string query = $"DELETE FROM {typeof(T).Name} WHERE Id = @id";
+                int rowsAffected = await connection.ExecuteAsync(query, entity.Id );
+
+                if (rowsAffected > 0)
+                {
+                    return rowsAffected;
+                }
+                else
+                {
+                    throw new DatabaseException("Geen rijen verwijderd uit de database.");
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                // Specifieke afhandeling voor SQLite gerelateerde fouten.
+                throw new DatabaseException("Fout tijdens het verwijderen van de entiteit uit de database.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Afhandeling van andere onverwachte fouten.
+                throw new Exception("Een onverwachte fout is opgetreden tijdens het verwijderen van de entiteit.", ex);
+            }
         }
 
         public async Task<List<T>> GetAllAsync()

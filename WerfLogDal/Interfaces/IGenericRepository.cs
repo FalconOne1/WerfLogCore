@@ -13,8 +13,8 @@ namespace WerfLogDal.Interfaces
         Task<List<T>> GetAllAsync();
         Task<T> GetById(int id);
         Task<T> InsertWithReturnAsync(T entity);
-      
-        int Delete(T entity);
+
+        Task<int> Delete(T entity);
 
         Task InsertWithNoReturnAsync(T entity);
 

@@ -46,32 +46,31 @@
         </Grid>
 
          <!--Lijst van Notities-->
-        <ListView x:Name="NotitiesListView" Grid.Row="3" ItemsSource="{Binding Notities}" VerticalOptions="FillAndExpand" HasUnevenRows="True">
-            <ListView.ItemTemplate>
+        <CollectionView x:Name="NotitiesCollectionView" Grid.Row="3" ItemsSource="{Binding Notities}" VerticalOptions="FillAndExpand">
+            <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <ViewCell>
-                        <SwipeView>
-                            <SwipeView.RightItems>
-                                <SwipeItems>
-                                    <!-- Knop voor verwijderen -->
-                                    <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
-                                                Command="{Binding Source={x:Reference NotitiesListView}, Path=BindingContext.DeleteNotitieCommand}" 
-                                                CommandParameter="{Binding .}"/>    
-                                </SwipeItems>
-                            </SwipeView.RightItems>
-                            <Frame BorderColor="LightGray" Padding="10" Margin="5">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems>
+                                <!-- Knop voor verwijderen -->
+                                <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
+                                   Command="{Binding Source={x:Reference NotitiesCollectionView}, Path=BindingContext.DeleteNotitieCommand}" 
+                                   CommandParameter="{Binding .}"/>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Frame BorderColor="LightGray" Padding="10" Margin="5">
                             <StackLayout Orientation="Vertical">
                                 <Label Text="{Binding Datum, StringFormat='{0:dd/MM/yyyy}'}" FontAttributes="Bold" />
                                 <Label Text="{Binding Tekst}" />
                             </StackLayout>
                         </Frame>
-                            </SwipeView>
-                    </ViewCell>
+                    </SwipeView>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
 
-         <!--Terugkeerknop--><!-- 
+
+        <!--Terugkeerknop--><!-- 
         <Button Grid.Row="4" Text="Overzicht werven" Command="{Binding GoBackCommand}"
                 HorizontalOptions="Center" VerticalOptions="End" Margin="20" 
                 WidthRequest="200" HeightRequest="50" BackgroundColor="DarkSlateGrey" TextColor="White"/>-->

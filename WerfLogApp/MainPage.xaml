@@ -77,56 +77,43 @@
         </Grid>
 
         <!-- ScrollView voor de lijst, maakt alleen dit gedeelte scrollbaar -->
-        <ScrollView Grid.Row="2" VerticalOptions="FillAndExpand" >
-            <StackLayout Padding="10">
-                <!-- Een lijst van werven -->
-                <ListView x:Name="WervenListView"  ItemsSource="{Binding Werven}" SelectedItem="{Binding GeselecteerdeWerf, Mode=TwoWay}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <ViewCell>
-                                <SwipeView>
-                                    <SwipeView.RightItems>
-                                        <SwipeItems>
-                                            <!-- Knop voor verwijderen -->
-                                            <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
-                                                       Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.VerwijderCommand}" 
-                                                       CommandParameter="{Binding .}"/> 
-                                        </SwipeItems>
-                                    </SwipeView.RightItems>
+        <StackLayout Padding="10" Grid.Row="2" VerticalOptions="FillAndExpand">
+            <!-- Een lijst van werven -->
+            <CollectionView x:Name="WervenCollectionView" ItemsSource="{Binding Werven}" SelectedItem="{Binding GeselecteerdeWerf, Mode=TwoWay}" SelectionMode="Single">
+    <CollectionView.ItemTemplate>
+        <DataTemplate>
+            <SwipeView>
+                <SwipeView.RightItems>
+                    <SwipeItems>
+                        <!-- Knop voor verwijderen -->
+                        <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
+                                   Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.VerwijderCommand}" 
+                                   CommandParameter="{Binding .}"/>
+                    </SwipeItems>
+                </SwipeView.RightItems>
+                <Grid Padding="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                                    <Grid Padding="5">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                    <!-- Naam van de werf -->
+                    <Label Text="{Binding Naam}" Grid.Column="0" />
 
-                                        <!-- Naam van de werf -->
-                                        <Label Text="{Binding Naam}" Grid.Column="0" />
+                    <!-- Gesture met logo -->
+                    <Grid Grid.Column="1" WidthRequest="50" HeightRequest="50" HorizontalOptions="End" VerticalOptions="Center" BackgroundColor="Transparent">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding .}"/>
+                        </Grid.GestureRecognizers>
+                        <Image Source="boek_penseel_logo.png" Aspect="AspectFit"/>
+                    </Grid>
+                </Grid>
+            </SwipeView>
+        </DataTemplate>
+    </CollectionView.ItemTemplate>
+</CollectionView>
 
-                                        <!-- Gesture met logo -->
-                                        <Grid Grid.Column="1" 
-                                              WidthRequest="50" 
-                                              HeightRequest="50" 
-                                              HorizontalOptions="End" 
-                                              VerticalOptions="Center" 
-                                              BackgroundColor="Transparent">
-                                            <Grid.GestureRecognizers>
-                                                <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenListView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding .}"> <!--was binding id-->
-                                 
-                                                </TapGestureRecognizer>
-
-                                            </Grid.GestureRecognizers>
-                                            <Image Source="boek_penseel_logo.png" Aspect="AspectFit"/>
-                                        </Grid>
-
-                                    </Grid>
-                                </SwipeView>
-                            </ViewCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackLayout>
-        </ScrollView>
+        </StackLayout>
 
         <!-- Footer met logo's en timer -->
         <Grid Grid.Row="3" Padding="25,20,25,17" VerticalOptions="End">

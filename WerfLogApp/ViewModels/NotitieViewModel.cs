@@ -23,18 +23,19 @@ namespace WerfLogApp.ViewModels
         private string _nieuweNotitieText; //achterliggend wordt een public NieuweNotitieText aangemaakt. 
 
         //private field
+        [ObservableProperty]
         private ObservableCollection<NotitieDto> _notities;
 
         //public getter & setter 
-        public ObservableCollection<NotitieDto> Notities
-        {
-            get => _notities;
-            set
-            {
-                _notities = value;
-                OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door BindableObject.
-            }
-        }
+        //public ObservableCollection<NotitieDto> Notities
+        //{
+        //    get => _notities;
+        //    set
+        //    {
+        //        _notities = value;
+        //        OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door BindableObject.
+        //    }
+        //}
 
         public NotitieViewModel(INotitieManager notitieManager)
         {
@@ -129,13 +130,30 @@ namespace WerfLogApp.ViewModels
         }
 
         //COMMAND NOTITIE VERWIJDEREN
-        public Command DeleteNotitieCommand => new Command<NotitieDto>(NotitieVerwijderen);
+        public Command<NotitieDto> DeleteNotitieCommand => new Command<NotitieDto>(async (notitie) => await NotitieVerwijderenAsync(notitie));
 
-        //METHODE NOTITIE VERWIJDEREN
-        public void NotitieVerwijderen(NotitieDto notitie)
+        // METHODE NOTITIE VERWIJDEREN
+        public async Task NotitieVerwijderenAsync(NotitieDto notitie)
         {
-            Notities.Remove(notitie);
+            try
+            {
+                await _notitieManager.DeleteNotitieAsync(notitie);
+                Notities.Remove(notitie);
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+          
+         
         }
+
 
         ////COMMAND NAVIGATIE NAAR MAINPAGE
         //public Command GoBackCommand => new Command(GoBack);
@@ -151,7 +169,7 @@ namespace WerfLogApp.ViewModels
         //        await ShowErrorMessage("Fout bij navigeren naar mainpage.");
         //    } 
         //}
- 
+
         //ERROR POPUP IN VIEW
         private async Task ShowErrorMessage(string message)
         {

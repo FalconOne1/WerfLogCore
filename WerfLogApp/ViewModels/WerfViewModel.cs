@@ -34,19 +34,19 @@ namespace WerfLogApp.ViewModels
         [ObservableProperty]
         private WerfDto _geselecteerdeWerf;
 
-        //private field
+       [ObservableProperty]
         private ObservableCollection<WerfDto> _werven;
 
         //public getter & setter 
-        public ObservableCollection<WerfDto> Werven
-        {
-            get => _werven;
-            set
-            {
-                _werven = value;
-                OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door ObservableObject.
-            }
-        }
+        //public ObservableCollection<WerfDto> Werven
+        //{
+        //    get => _werven;
+        //    set
+        //    {
+        //        _werven = value;
+        //        OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door ObservableObject.
+        //    }
+        //}
 
         public WerfViewModel(IWerfManager werfManager, ITijdregistratieManager tijdregistratieManager)
         {
@@ -112,15 +112,36 @@ namespace WerfLogApp.ViewModels
             if (bevestigVerwijderen)
             {
                 // Voer de verwijderactie uit
-                WerfVerwijderen(werf);
+                await WerfVerwijderenAsync(werf);
             }
         });
 
         //METHODE VERWIJDEREN WERF
-        public void WerfVerwijderen(WerfDto werf)
+        public async Task WerfVerwijderenAsync(WerfDto werf)
         {
-            Werven.Remove(werf);
+            try
+            {
+                await _werfManager.DeleteWerfAsync(werf);
+
+
+              
+                    Werven.Remove(werf);
+               
+
+
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
         }
+
 
         //COMMAND NAVIGATIE NAAR NOTITIES VAN WERF
         public Command<WerfDto> NotitieCommand => new Command<WerfDto>(async (werfDto) => await TapWerf(werfDto));

@@ -6,5 +6,7 @@ namespace WerfLogBl.Interfaces
     {
         Task<List<WerfDto>> HaalAlleWervenOp();
         Task<WerfDto> AddWerfAsync(WerfDto werfDto);
+
+        Task DeleteWerfAsync(WerfDto werfDto);
     }
 }

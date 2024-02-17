@@ -14,5 +14,7 @@ namespace WerfLogBl.Interfaces
         Task<NotitieDto> AddNotitieAsync(NotitieDto notitieDto);
 
         Task<List<NotitieDto>> GetAllNotities(int werfId);
+
+        Task DeleteNotitieAsync(NotitieDto notitieDto);
     }
 }

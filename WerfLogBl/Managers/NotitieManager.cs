@@ -73,5 +73,30 @@ namespace WerfLogBl.Managers
            
         }
 
+        public async Task DeleteNotitieAsync(NotitieDto notitieDto)
+        {
+            try
+            {
+                // Map NotitieDto naar Notitie met behulp van AutoMapper
+                Notitie notitie = _mapper.Map<Notitie>(notitieDto);
+
+                // Voeg de Notitie toe aan de database en wacht op het resultaat
+                // Dit veronderstelt dat InsertWithReturnAsync een asynchrone methode is die een Notitie object teruggeeft
+                int row = await _notitieRepository.Delete(notitie);
+
+                // Map het resultaat (Notitie) terug naar NotitieDto met behulp van AutoMapper
+             
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
     }
 }

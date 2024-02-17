@@ -82,6 +82,8 @@ namespace WerfLogDal
                 {
                     _connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
                 }
+
+               
                 await Init();
                 return _connection;
             }
