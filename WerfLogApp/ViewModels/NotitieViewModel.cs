@@ -6,11 +6,14 @@ using WerfLogDal.Exceptions;
 
 namespace WerfLogApp.ViewModels
 {
-    
+
     [QueryProperty("WerfNavigatieId", "werfNavigatieId")]
     [QueryProperty("WerfNaam", "werfNaam")]
-    public partial class NotitieViewModel : ObservableObject 
+    public partial class NotitieViewModel : ObservableObject
     {
+
+        public event Action<NotitieDto> OnNotitieToegevoegd;
+
         private INotitieManager _notitieManager;
 
         [ObservableProperty]
@@ -26,17 +29,6 @@ namespace WerfLogApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<NotitieDto> _notities;
 
-        //public getter & setter 
-        //public ObservableCollection<NotitieDto> Notities
-        //{
-        //    get => _notities;
-        //    set
-        //    {
-        //        _notities = value;
-        //        OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door BindableObject.
-        //    }
-        //}
-
         public NotitieViewModel(INotitieManager notitieManager)
         {
             _notitieManager = notitieManager;
@@ -44,7 +36,7 @@ namespace WerfLogApp.ViewModels
         }
 
         //COMMAND NOTITIE AANMAKEN
-        public Command VoegNotitieToeCommand => new Command(async() => await NotitieAanmakenAsync());
+        public Command VoegNotitieToeCommand => new Command(async () => await NotitieAanmakenAsync());
 
         //METHODE NOTITIE AANMAKEN
         public async Task NotitieAanmakenAsync()
@@ -71,6 +63,9 @@ namespace WerfLogApp.ViewModels
 
                         // Maak het invoerveld leeg
                         NieuweNotitieText = string.Empty;
+
+                        //scroll naar toegevoegd item
+                        OnNotitieToegevoegd?.Invoke(toegevoegdeNotitieDto);
                     }
                     else
                     {
@@ -150,25 +145,10 @@ namespace WerfLogApp.ViewModels
                 // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
-          
-         
+
+
         }
 
-
-        ////COMMAND NAVIGATIE NAAR MAINPAGE
-        //public Command GoBackCommand => new Command(GoBack);
-        ////METHODE NAVIGATIE NAAR MAINPAGE
-        //public async void GoBack()
-        //{
-        //    try
-        //    {
-        //        await Shell.Current.GoToAsync("..");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        await ShowErrorMessage("Fout bij navigeren naar mainpage.");
-        //    } 
-        //}
 
         //ERROR POPUP IN VIEW
         private async Task ShowErrorMessage(string message)

@@ -37,13 +37,7 @@
                 <!-- Voor het rechter logo -->
             </Grid.ColumnDefinitions>
 
-            <!-- Linker Logo met TapGestureRecognizer -->
-            <!--<Image Source="meeting2_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="55" VerticalOptions="Start" Margin="4,10,0,0" >
-                <Image.GestureRecognizers
-                    Command="{Binding TijdRegistratieCommand}">
-                    --><!--<TapGestureRecognizer Tapped="LinkerLogo_Tapped"/>--><!--
-                </Image.GestureRecognizers>
-            </Image>-->
+       
 
             <Image Source="zandloper_logo.png" Grid.Column="0" Aspect="AspectFit" HeightRequest="45" VerticalOptions="Start" Margin="5,12,0,0">
                 <Image.GestureRecognizers>
@@ -54,14 +48,17 @@
 
 
             <!-- Hoofdafbeelding in het midden -->
-            <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center" Margin="17,0,0,0"/>
+            <Image Source="telematica_logotrans.png" Grid.Column="1" Aspect="AspectFit" HeightRequest="180" VerticalOptions="Center" Margin="14,0,0,0"/>
 
-            <!-- Rechter Logo met TapGestureRecognizer -->
-            <Image Source="meeting2_logo.png" Grid.Column="2" Aspect="AspectFit" HeightRequest="58"  VerticalOptions="Start" Margin="0,4,10,0">
+             <!--Rechter Logo met TapGestureRecognizer-->
+            <Image Source="meeting2_logo.png" Grid.Column="2" Aspect="AspectFit" HeightRequest="58"  VerticalOptions="Start" Margin="0,4,10,0" Opacity="0">
+                <!--OPACITY 0 verbergt de afbeelding-->
                 <Image.GestureRecognizers>
-                    <!--<TapGestureRecognizer Tapped="RechterLogo_Tapped"/>-->
+                    <TapGestureRecognizer />
                 </Image.GestureRecognizers>
             </Image>
+            
+            
         </Grid>
 
         <!-- Invoerbalk met bevestigingsknop -->
@@ -76,45 +73,47 @@
                     WidthRequest="100" BackgroundColor="DarkSlateGrey" Margin="10,0,0,0" HeightRequest="38"  Command="{Binding VoegWerfToeCommand}" />
         </Grid>
 
+       
         <!-- ScrollView voor de lijst, maakt alleen dit gedeelte scrollbaar -->
-        <StackLayout Padding="10" Grid.Row="2" VerticalOptions="FillAndExpand">
+        <Grid Padding="5" Grid.Row="2" >
             <!-- Een lijst van werven -->
-            <CollectionView x:Name="WervenCollectionView" ItemsSource="{Binding Werven}" SelectedItem="{Binding GeselecteerdeWerf, Mode=TwoWay}" SelectionMode="Single">
-    <CollectionView.ItemTemplate>
-        <DataTemplate>
-            <SwipeView>
-                <SwipeView.RightItems>
-                    <SwipeItems>
-                        <!-- Knop voor verwijderen -->
-                        <SwipeItem Text="Verwijderen" BackgroundColor="Red" 
-                                   Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.VerwijderCommand}" 
-                                   CommandParameter="{Binding .}"/>
-                    </SwipeItems>
-                </SwipeView.RightItems>
-                <Grid Padding="5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <CollectionView x:Name="WervenCollectionView" ItemsSource="{Binding Werven}" SelectedItem="{Binding GeselecteerdeWerf, Mode=TwoWay}" SelectionMode="Single">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <!-- Knop voor verwijderen -->
+                                        <SwipeItem Text="Verwijderen" BackgroundColor="Red"
+                               Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.VerwijderCommand}"
+                               CommandParameter="{Binding .}"/>
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
 
-                    <!-- Naam van de werf -->
-                    <Label Text="{Binding Naam}" Grid.Column="0" />
+                                <Grid Padding="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                    <!-- Gesture met logo -->
-                    <Grid Grid.Column="1" WidthRequest="50" HeightRequest="50" HorizontalOptions="End" VerticalOptions="Center" BackgroundColor="Transparent">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NotitieButton_Clicked" Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding .}"/>
-                        </Grid.GestureRecognizers>
-                        <Image Source="boek_penseel_logo.png" Aspect="AspectFit"/>
-                    </Grid>
-                </Grid>
-            </SwipeView>
-        </DataTemplate>
-    </CollectionView.ItemTemplate>
-</CollectionView>
+                                    <!-- Naam van de werf -->
+                                    <Label Text="{Binding Naam}" Grid.Column="0" VerticalOptions="Center" />
 
-        </StackLayout>
+                                    <!-- Gesture met logo -->
+                                    <Grid Grid.Column="1" WidthRequest="45" HeightRequest="45" HorizontalOptions="End" VerticalOptions="Center" BackgroundColor="Transparent">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference WervenCollectionView}, Path=BindingContext.NotitieCommand}" CommandParameter="{Binding .}"/>
+                                        </Grid.GestureRecognizers>
+                                        <Image Source="boek_penseel_logo.png" Aspect="AspectFit" VerticalOptions="Center"/>
+                                    </Grid>
+                                </Grid>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
 
+                </CollectionView>
+            </Grid>
+      
         <!-- Footer met logo's en timer -->
         <Grid Grid.Row="3" Padding="25,20,25,17" VerticalOptions="End">
             <Grid.ColumnDefinitions>
@@ -128,7 +127,7 @@
 
             <Image Source="chrono_groen.png" Grid.Column="0" HeightRequest="40" WidthRequest="40" HorizontalOptions="Start">
                 <Image.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding GroeneKnopCommand}" NumberOfTapsRequired="2"/>
+                    <TapGestureRecognizer Command="{Binding GroeneKnopCommand}" Tapped="OnChronoTapped"  NumberOfTapsRequired="2"/>
                 </Image.GestureRecognizers>
             </Image>
 
@@ -142,7 +141,7 @@
             <!-- Rechter Chrono Image met TapGestureRecognizer -->
             <Image Source="chrono_rood.png" Grid.Column="2" HeightRequest="40" WidthRequest="40" HorizontalOptions="End">
                 <Image.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding RodeKnopCommand}" NumberOfTapsRequired="2"/>
+                    <TapGestureRecognizer Command="{Binding RodeKnopCommand}" Tapped="OnChronoTapped"  NumberOfTapsRequired="2"/>
                 </Image.GestureRecognizers>
             </Image>
 

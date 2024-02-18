@@ -1,10 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
-using System.Windows.Input;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
 using WerfLogDal.Exceptions;
-using WerfLogDal.Models;
 
 
 namespace WerfLogApp.ViewModels
@@ -59,6 +56,35 @@ namespace WerfLogApp.ViewModels
             {
                 await _tijdregistratieManager.UpdateTijdregistratie(TijdregistratieId, Tijdregistratie);
                 await App.Current.MainPage.DisplayAlert("Gelukt", "Aangepaste tijdregistratie opgeslagen", "OK");
+
+
+                await App.Current.MainPage.Navigation.PopAsync();
+            }
+            catch (DatabaseException ex)
+            {
+                // Specifieke afhandeling voor databasegerelateerde fouten.
+                await ShowErrorMessage($"Databasefout: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                // Algemene foutafhandeling.
+                await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+            }
+
+        }
+
+        public Command DeleteCommand => new Command(async () => await DeleteTijdregistratie());
+
+        public async Task DeleteTijdregistratie()
+        {
+            try
+            {
+                await _tijdregistratieManager.DeleteTijdregistratieAsync(Tijdregistratie);
+
+                await App.Current.MainPage.DisplayAlert("Gelukt", "Tijdregistratie werd verwijderd.", "OK");
+
+                await App.Current.MainPage.Navigation.PopAsync();
+
             }
             catch (DatabaseException ex)
             {

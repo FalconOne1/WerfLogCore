@@ -10,7 +10,7 @@ namespace WerfLogDal.Repositories
     {
         internal readonly DbContext _context;
 
-        public GenericRepository(DbContext context) 
+        public GenericRepository(DbContext context)
         {
             _context = context;
         }
@@ -21,7 +21,7 @@ namespace WerfLogDal.Repositories
             try
             {
                 SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
-                connection.InsertAsync(entity);
+                await connection.InsertAsync(entity);
             }
             catch (SQLiteException ex)
             {
@@ -58,7 +58,7 @@ namespace WerfLogDal.Repositories
                 }
                 else
                 {
-                  throw new DatabaseException("Geen rijen toegevoegd aan de database.");
+                    throw new DatabaseException("Geen rijen toegevoegd aan de database.");
                 }
             }
             catch (SQLiteException ex)
@@ -73,35 +73,7 @@ namespace WerfLogDal.Repositories
             }
         }
 
-        //public async Task<int> Delete(T entity)
-        //{
-        //    try
-        //    {
-        //        SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
 
-        //        // Verwijder de entiteit uit de database
-        //        int rowsAffected = await connection.DeleteAsync(entity);
-
-        //        if (rowsAffected > 0)
-        //        {
-        //            return rowsAffected;
-        //        }
-        //        else
-        //        {
-        //            throw new DatabaseException("Geen rijen verwijderd uit de database.");
-        //        }
-        //    }
-        //    catch (SQLiteException ex)
-        //    {
-        //        // Specifieke afhandeling voor SQLite gerelateerde fouten.
-        //        throw new DatabaseException("Fout tijdens het verwijderen van de entiteit uit de database.", ex);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Afhandeling van andere onverwachte fouten.
-        //        throw new Exception("Een onverwachte fout is opgetreden tijdens het verwijderen van de entiteit.", ex);
-        //    }
-        //}
 
         public async Task<int> Delete(T entity)
         {
@@ -111,7 +83,7 @@ namespace WerfLogDal.Repositories
 
                 // Stel een SQL-delete-query samen
                 string query = $"DELETE FROM {typeof(T).Name} WHERE Id = @id";
-                int rowsAffected = await connection.ExecuteAsync(query, entity.Id );
+                int rowsAffected = await connection.ExecuteAsync(query, entity.Id);
 
                 if (rowsAffected > 0)
                 {
@@ -134,38 +106,9 @@ namespace WerfLogDal.Repositories
             }
         }
 
-        public async Task<List<T>> GetAllAsync()
-        {
-            //try
-            //{
-            //    SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
-
-            //    // Verwijder de WHERE-clausule om alle rijen op te halen
-
-            //    string query = $"SELECT * FROM {typeof(T).Name}";
-            //    List<T> entities = await connection.QueryAsync<T>(query);
-
-            //    return entities;
-            //}
-            //catch (SQLiteException ex)
-            //{
-            //    // Specifieke afhandeling voor SQLite gerelateerde fouten.
-            //    throw new Exception("Fout tijdens het ophalen van gegevens uit de database.", ex);
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Afhandeling van andere onverwachte fouten.
-            //    throw new Exception("Een onverwachte fout is opgetreden tijdens het ophalen van gegevens.", ex);
-            //}
-
-            throw new NotImplementedException();
-        }
 
 
-        public async Task<T>GetById(int id) 
-        {
-            throw new NotImplementedException();
-        }
+
 
     }
 }

@@ -1,12 +1,49 @@
-﻿using SQLite;
-
-namespace WerfLogDal.Models
+﻿namespace WerfLogDal.Models
 {
 
     //[Table("Notities")]
-    public  class Notitie : BaseModel
+    public class Notitie : BaseModel
+
+    /* Unmerged change from project 'WerfLogDal (net8.0-android)'
+    Before:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    After:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    */
+
+    /* Unmerged change from project 'WerfLogDal (net8.0-maccatalyst)'
+    Before:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    After:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    */
+
+    /* Unmerged change from project 'WerfLogDal (net8.0-windows10.0.19041.0)'
+    Before:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    After:
+        {
+
+
+            //[PrimaryKey, AutoIncrement]
+    */
     {
-        
+
 
         //[PrimaryKey, AutoIncrement]
         //public int Id { get; set; }
@@ -17,10 +54,10 @@ namespace WerfLogDal.Models
 
         // Expliciet definiëren van de foreign key-naam
         //[ForeignKey(typeof(Werf))]
-        public int WerfId { get; set; } 
+        public int WerfId { get; set; }
 
         //Navigatie-eigenschappen
-       //[ManyToOne]
+        //[ManyToOne]
         //public Werf Werf { get; set; }
     }
 }

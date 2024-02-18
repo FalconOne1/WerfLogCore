@@ -1,26 +1,20 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
 using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
-using WerfLogDal.Repositories;
 
 namespace WerfLogBl.Managers
 {
-   public class NotitieManager : INotitieManager
+    public class NotitieManager : INotitieManager
     {
 
         private readonly INotitieRepository _notitieRepository;
         private readonly IMapper _mapper;
         public NotitieManager(INotitieRepository notitieRepository, IMapper mapper)
         {
-            _mapper = mapper;   
+            _mapper = mapper;
             _notitieRepository = notitieRepository;
         }
 
@@ -42,7 +36,7 @@ namespace WerfLogBl.Managers
             {
                 throw;
             }
-           
+
         }
 
         public async Task<NotitieDto> AddNotitieAsync(NotitieDto notitieDto)
@@ -70,7 +64,7 @@ namespace WerfLogBl.Managers
             {
                 throw;
             }
-           
+
         }
 
         public async Task DeleteNotitieAsync(NotitieDto notitieDto)
@@ -85,7 +79,7 @@ namespace WerfLogBl.Managers
                 int row = await _notitieRepository.Delete(notitie);
 
                 // Map het resultaat (Notitie) terug naar NotitieDto met behulp van AutoMapper
-             
+
             }
             catch (DatabaseException ex)
             {

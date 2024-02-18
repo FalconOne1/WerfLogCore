@@ -1,9 +1,4 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WerfLogDal.Exceptions;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
@@ -22,7 +17,7 @@ namespace WerfLogDal.Repositories
             {
                 SQLiteAsyncConnection connection = await _context.GetConnectionAsync();
 
-                string query = "SELECT * FROM Notitie WHERE WerfId = ?";
+                string query = "SELECT * FROM Notitie WHERE WerfId = ? ORDER BY Datum DESC";
 
                 List<Notitie> result = await connection.QueryAsync<Notitie>(query, Id);
                 return result;
@@ -41,4 +36,3 @@ namespace WerfLogDal.Repositories
         }
     }
 }
- 

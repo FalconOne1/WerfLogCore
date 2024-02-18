@@ -1,8 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
-using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
@@ -94,7 +91,7 @@ namespace WerfLogApp.ViewModels
                 // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
-            
+
         }
 
 
@@ -133,7 +130,7 @@ namespace WerfLogApp.ViewModels
                 // Algemene foutafhandeling.
                 await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
             }
-            
+
         }
 
         //ERROR POPUP IN VIEW

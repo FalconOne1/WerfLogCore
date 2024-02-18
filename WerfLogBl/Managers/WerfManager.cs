@@ -58,7 +58,7 @@ namespace WerfLogBl.Managers
             catch (Exception ex)
             {
                 throw;
-            } 
+            }
         }
 
         public async Task DeleteWerfAsync(WerfDto werfDto)

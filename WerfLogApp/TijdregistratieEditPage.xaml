@@ -49,7 +49,8 @@
             <!-- Voeg hier eventueel extra velden toe -->
 
             <!-- Button voor Opslaan -->
-            <Button Text="Opslaan" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center" Command="{Binding SaveCommand}"/>
+            <Button Text="Opslaan" BackgroundColor="DarkSlateGrey" Grid.Row="2" Grid.Column="0" HorizontalOptions="Center" VerticalOptions="Center" Command="{Binding SaveCommand}"/>
+            <Button Text="Verwijderen" BackgroundColor="DarkSlateGrey" Grid.Row="2" Grid.Column="1" HorizontalOptions="Start" Margin="10,0,0,0" VerticalOptions="Center"  Command="{Binding DeleteCommand}"/>
         </Grid>
     </Grid>
 </ContentPage>

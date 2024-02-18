@@ -6,8 +6,8 @@ public partial class TijdregistratiePage : ContentPage
 {
     private TijdregistratieViewModel _viewModel;
     public TijdregistratiePage(TijdregistratieViewModel tijdregistratieViewModel)
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         BindingContext = tijdregistratieViewModel;
         _viewModel = tijdregistratieViewModel;
     }

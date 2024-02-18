@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
 namespace WerfLogApp.Converter
 {
@@ -15,7 +10,7 @@ namespace WerfLogApp.Converter
             if (text == "Aanwezig")
                 return Colors.Green;
             else
-                return Colors.Red; 
+                return Colors.Red;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

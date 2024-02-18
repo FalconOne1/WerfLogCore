@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
 namespace WerfLogApp.Converter
 {
-   
-        public class TimeStringConverter : IValueConverter
-        {
+
+    public class TimeStringConverter : IValueConverter
+    {
         //Omzetten van DATETIME naar String en visa versa, in applicatielaag --> in samenwerking met XAML
 
         private const string DateTimeFormat = "dd/MM/yyyy";
@@ -30,9 +25,9 @@ namespace WerfLogApp.Converter
                 return dateTime;
             }
             // Signaleer een ongeldige invoer.
-            return null; 
+            return null;
         }
     }
 
-    }
+}
 

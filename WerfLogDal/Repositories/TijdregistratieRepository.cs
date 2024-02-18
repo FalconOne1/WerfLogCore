@@ -5,9 +5,9 @@ using WerfLogDal.Models;
 
 namespace WerfLogDal.Repositories
 {
-    public class TijdregistratieRepository : GenericRepository<Tijdregistratie>,  ITijdregistratieRepository
+    public class TijdregistratieRepository : GenericRepository<Tijdregistratie>, ITijdregistratieRepository
     {
-        public TijdregistratieRepository(DbContext connection) : base (connection)
+        public TijdregistratieRepository(DbContext connection) : base(connection)
         {
         }
 
@@ -31,7 +31,7 @@ namespace WerfLogDal.Repositories
                 string query = "UPDATE Tijdregistratie SET StopTijd = @stopTijd, TotaleTijd = @totaleTijdInMinuten WHERE Id = @id";
 
                 // Voer de update uit.
-                int rowsAffected = await connection.ExecuteAsync(query,stopTijd, totaleTijdInMinuten, id);
+                int rowsAffected = await connection.ExecuteAsync(query, stopTijd, totaleTijdInMinuten, id);
 
                 if (rowsAffected == 0)
                 {
@@ -64,7 +64,7 @@ namespace WerfLogDal.Repositories
                 string query = "UPDATE Tijdregistratie SET StartTijd = @startTijd, StopTijd = @stopTijd, TotaleTijd = @totaleTijdInMinuten WHERE Id = @id";
 
                 // Voer de update uit.
-                int rowsAffected = await connection.ExecuteAsync(query,tijdregistratie.StartTijd, tijdregistratie.StopTijd, totaleTijdInMinuten, id );
+                int rowsAffected = await connection.ExecuteAsync(query, tijdregistratie.StartTijd, tijdregistratie.StopTijd, totaleTijdInMinuten, id);
 
                 if (rowsAffected == 0)
                 {
@@ -190,7 +190,7 @@ namespace WerfLogDal.Repositories
                 // Controleer of er een resultaat is en bereken het totaal aantal uren.
                 if (totaleDuurInMinuten.HasValue)
                 {
-                    return totaleDuurInMinuten.Value; 
+                    return totaleDuurInMinuten.Value;
                 }
             }
             catch (SQLiteException ex)

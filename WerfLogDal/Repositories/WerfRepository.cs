@@ -1,9 +1,4 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WerfLogDal.Interfaces;
 using WerfLogDal.Models;
 
@@ -24,7 +19,7 @@ namespace WerfLogDal.Repositories
 
                 //Controle of item niet "verwijdert is" -> Where 0
 
-                string query = $"SELECT * FROM Werf WHERE IsActief != 0";
+                string query = $"SELECT * FROM Werf WHERE IsActief != 0 ORDER BY Naam ASC";
                 List<Werf> entities = await connection.QueryAsync<Werf>(query);
 
                 return entities;

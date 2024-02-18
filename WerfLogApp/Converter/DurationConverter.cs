@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 
 namespace WerfLogApp.Converter
 {
-    public  class DurationConverter : IValueConverter
+    public class DurationConverter : IValueConverter
     {
         //Omzetten TotaalUren van INT naar String en visa versa, in applicatielaag --> in samenwerking met XAML
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

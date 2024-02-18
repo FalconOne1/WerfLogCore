@@ -2,7 +2,7 @@
 
 namespace WerfLogBl.Interfaces
 {
-    public  interface ITijdregistratieManager
+    public interface ITijdregistratieManager
     {
         Task<int> VoegStarttijdWerfToe(WerfDto werf);
         Task VoegStoptijdWerfToe(int actieveTijdId);
@@ -12,6 +12,8 @@ namespace WerfLogBl.Interfaces
 
         Task<TijdregistratieDto> GetTijdregistratieById(int id);
 
-        Task UpdateTijdregistratie(int id,TijdregistratieDto tijdregistratieDto);
+        Task UpdateTijdregistratie(int id, TijdregistratieDto tijdregistratieDto);
+
+        Task DeleteTijdregistratieAsync(TijdregistratieDto tijdregistratieDto);
     }
 }

@@ -1,6 +1,4 @@
-using CommunityToolkit.Mvvm.Messaging;
 using WerfLogApp.ViewModels;
-using WerfLogBl.DTOS;
 
 namespace WerfLogApp;
 
@@ -24,10 +22,10 @@ public partial class TijdregistratieEditPage : ContentPage
     }
 }
 
- 
 
 
 
-  
+
+
 
 

@@ -11,7 +11,7 @@ namespace WerfLogDal
         public DbContext()
         {
             //_/*connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);*/
-              //GetConnectionAsync();
+            //GetConnectionAsync();
         }
         private async Task Init()
         {
@@ -72,7 +72,7 @@ namespace WerfLogDal
             catch (Exception ex)
             {
                 throw new Exception("Algemene fout bij aanmaken databank.", ex);
-            }  
+            }
         }
         public async Task<SQLiteAsyncConnection> GetConnectionAsync()
         {
@@ -83,7 +83,7 @@ namespace WerfLogDal
                     _connection = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
                 }
 
-               
+
                 await Init();
                 return _connection;
             }
@@ -94,7 +94,7 @@ namespace WerfLogDal
 
             catch (Exception ex)
             {
-               throw new Exception("Algemene Fout bij verbinden met databank.", ex);
+                throw new Exception("Algemene Fout bij verbinden met databank.", ex);
             }
         }
     }

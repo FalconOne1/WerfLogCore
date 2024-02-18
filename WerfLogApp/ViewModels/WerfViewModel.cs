@@ -1,19 +1,15 @@
 ﻿
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
 using WerfLogBl.DTOS;
 using WerfLogBl.Interfaces;
-using WerfLogBl.Managers;
 using WerfLogDal.Exceptions;
-using WerfLogDal.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WerfLogApp.ViewModels
 {
     public partial class WerfViewModel : ObservableObject
     {
+        public event Action<WerfDto> OnWerfToegevoegd;
 
         private IWerfManager _werfManager;
         private ITijdregistratieManager _tijdregistratieManager;
@@ -34,19 +30,9 @@ namespace WerfLogApp.ViewModels
         [ObservableProperty]
         private WerfDto _geselecteerdeWerf;
 
-       [ObservableProperty]
+        [ObservableProperty]
         private ObservableCollection<WerfDto> _werven;
 
-        //public getter & setter 
-        //public ObservableCollection<WerfDto> Werven
-        //{
-        //    get => _werven;
-        //    set
-        //    {
-        //        _werven = value;
-        //        OnPropertyChanged(); //automatisch updaten UI/logica -> toegankelijk door ObservableObject.
-        //    }
-        //}
 
         public WerfViewModel(IWerfManager werfManager, ITijdregistratieManager tijdregistratieManager)
         {
@@ -64,7 +50,7 @@ namespace WerfLogApp.ViewModels
         {
             if (!string.IsNullOrEmpty(NieuweWerfText))
             {
-                var werfDto = new WerfDto { Naam = NieuweWerfText, Id = null, IsActief = 1};
+                var werfDto = new WerfDto { Naam = NieuweWerfText, Id = null, IsActief = 1 };
 
                 try
                 {
@@ -74,15 +60,19 @@ namespace WerfLogApp.ViewModels
                     if (toegevoegdeWerfDto != null)
                     {
                         // De werf is succesvol toegevoegd aan de database.
-                        Werven.Insert(0, toegevoegdeWerfDto); 
+                        Werven.Insert(0, toegevoegdeWerfDto);
 
                         // Maak het invoerveld leeg
                         NieuweWerfText = string.Empty;
+
+                        OnWerfToegevoegd?.Invoke(toegevoegdeWerfDto);
+
+
                     }
                     else
                     {
                         //Handel de situatie af als het toevoegen mislukt.
-                       await ShowErrorMessage("Het toevoegen van de werf is mislukt.");
+                        await ShowErrorMessage("Het toevoegen van de werf is mislukt.");
                     }
                 }
                 catch (DatabaseException ex)
@@ -93,12 +83,12 @@ namespace WerfLogApp.ViewModels
                 catch (Exception ex)
                 {
                     // Algemene foutafhandeling.
-                   await  ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
+                    await ShowErrorMessage($"Er is een fout opgetreden: {ex.Message}");
                 }
             }
             else
             {
-               await ShowErrorMessage("Werfnaam mag niet leeg zijn.");
+                await ShowErrorMessage("Werfnaam mag niet leeg zijn.");
             }
         }
 
@@ -124,9 +114,9 @@ namespace WerfLogApp.ViewModels
                 await _werfManager.DeleteWerfAsync(werf);
 
 
-              
-                    Werven.Remove(werf);
-               
+
+                Werven.Remove(werf);
+
 
 
             }
@@ -155,7 +145,7 @@ namespace WerfLogApp.ViewModels
                 {
                     await Shell.Current.GoToAsync($"{nameof(NotitiePage)}?werfNavigatieId={werf.Id}&werfNaam={werf.Naam}");
                 }
-               
+
                 catch (Exception ex)
                 {
                     // Algemene foutafhandeling.
@@ -217,7 +207,7 @@ namespace WerfLogApp.ViewModels
         {
             try
             {
-               if (!_actieveWerf)
+                if (!_actieveWerf)
                 {
                     _actieveTijdRegistratieId = await _tijdregistratieManager.VoegStarttijdWerfToe(werf);
                     _actieveWerf = true;
@@ -225,7 +215,7 @@ namespace WerfLogApp.ViewModels
                 }
                 else
                 {
-                    await ShowErrorMessage($"Laatste werf is nog actief, gelieve deze eerst af te sluiten."); 
+                    await ShowErrorMessage($"Laatste werf is nog actief, gelieve deze eerst af te sluiten.");
                 }
             }
             catch (DatabaseException ex)
@@ -273,15 +263,15 @@ namespace WerfLogApp.ViewModels
         {
             try
             {
-                if (actieveTijdId != 0 )
+                if (actieveTijdId != 0)
                 {
-                 await _tijdregistratieManager.VoegStoptijdWerfToe(actieveTijdId);
-                       _actieveWerf = false;
-                       TimerLabelText = "Afwezig";
+                    await _tijdregistratieManager.VoegStoptijdWerfToe(actieveTijdId);
+                    _actieveWerf = false;
+                    TimerLabelText = "Afwezig";
                 }
                 else
                 {
-                 await ShowErrorMessage($"Er is een fout opgetreden bij het opslaan.");
+                    await ShowErrorMessage($"Er is een fout opgetreden bij het opslaan.");
                 }
 
             }
@@ -305,7 +295,7 @@ namespace WerfLogApp.ViewModels
                 var actieveTijdregistratie = await _tijdregistratieManager.GetActieveTijdregistratieId();
 
                 //Indien geen actieve tijdregistratie meer, doe niets.
-                if(actieveTijdregistratie == null)
+                if (actieveTijdregistratie == null)
                 {
                     return;
                 }
@@ -341,7 +331,7 @@ namespace WerfLogApp.ViewModels
                         Werven.Add(werfDto);
                     }
 
-                        _isDataGeladen = true;
+                    _isDataGeladen = true;
 
                     if (Werven.Count > 0)
                     {
@@ -382,4 +372,3 @@ namespace WerfLogApp.ViewModels
 
 }
 
- 

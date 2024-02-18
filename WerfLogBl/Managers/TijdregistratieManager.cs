@@ -199,6 +199,33 @@ namespace WerfLogBl.Managers
 
             }
         }
+
+
+        public async Task DeleteTijdregistratieAsync(TijdregistratieDto tijdregistratieDto)
+        {
+            try
+            {
+                // Map NotitieDto naar Notitie met behulp van AutoMapper
+                Tijdregistratie tijdregistratie = _mapper.Map<Tijdregistratie>(tijdregistratieDto);
+
+                // Voeg de Notitie toe aan de database en wacht op het resultaat
+                // Dit veronderstelt dat InsertWithReturnAsync een asynchrone methode is die een Notitie object teruggeeft
+                int row = await _tijdRepository.Delete(tijdregistratie);
+
+                // Map het resultaat (Notitie) terug naar NotitieDto met behulp van AutoMapper
+
+            }
+            catch (DatabaseException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
     }
 }
 

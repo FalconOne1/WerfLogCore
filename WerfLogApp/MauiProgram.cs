@@ -4,7 +4,7 @@ using WerfLogBl.AutoMapperProfiles;
 using WerfLogBl.Interfaces;
 using WerfLogBl.Managers;
 using WerfLogDal;
-using WerfLogDal.Interfaces; 
+using WerfLogDal.Interfaces;
 using WerfLogDal.Repositories;
 
 namespace WerfLogApp
@@ -23,7 +23,7 @@ namespace WerfLogApp
                 });
 
 #if DEBUG
-    		builder.Logging.AddDebug();
+            builder.Logging.AddDebug();
 
 
 #endif
@@ -53,7 +53,8 @@ namespace WerfLogApp
             builder.Services.AddTransient<INotitieManager, NotitieManager>();
 
             builder.Services.AddTransient<ITijdregistratieManager, TijdregistratieManager>();
-            
+
+
 
             return builder.Build();
         }

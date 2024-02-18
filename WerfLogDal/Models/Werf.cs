@@ -1,9 +1,9 @@
 ﻿namespace WerfLogDal.Models
 {
     //[Table("Werven")]
-    public  class Werf : BaseModel
+    public class Werf : BaseModel
     {
-       
+
 
         //[PrimaryKey, AutoIncrement]
         //public int Id { get; set; }
@@ -11,7 +11,7 @@
         //[MaxLength(150)]
         public string Naam { get; set; }
 
-        public int IsActief { get; set; } 
+        public int IsActief { get; set; }
 
         //// Navigatie-eigenschappen
         //[OneToMany(CascadeOperations = CascadeOperation.All)]
